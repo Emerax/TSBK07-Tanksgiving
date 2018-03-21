@@ -98,7 +98,7 @@ void init(void)
 	
 // Load terrain data
 	
-	LoadTGATextureData("../assets/44-terrain.tga", &ttex);
+	LoadTGATextureData("../assets/big-flat-terrain.tga", &ttex);
 	tm = GenerateTerrain(&ttex);
 	printError("init terrain");
 }
