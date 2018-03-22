@@ -77,6 +77,9 @@ GLuint program;
 GLuint tex1, tex2;
 TextureData ttex; // terrain
 
+// Tank models
+Model *tankBase, *tankTower;
+
 void init(void)
 {
 	// GL inits
@@ -100,7 +103,11 @@ void init(void)
 	
 	LoadTGATextureData("../assets/big-flat-terrain.tga", &ttex);
 	tm = GenerateTerrain(&ttex);
-	printError("init terrain");
+        printError("init terrain");
+
+        // Load tank models
+        tankBase = LoadModelPlus("../assets/groundsphere.obj");
+        tankTower = LoadModelPlus("../assets/octagon.obj");
 }
 
 void display(void)
@@ -133,6 +140,12 @@ void display(void)
 	glutSwapBuffers();
 }
 
+void tankControls() {
+        // Manage keyboard controls
+
+        // Upload to the GPU 
+}
+
 void timer(int i)
 {
 	glutTimerFunc(20, &timer, i);
@@ -141,7 +154,7 @@ void timer(int i)
 
 void mouse(int x, int y)
 {
-	printf("%d %d\n", x, y);
+	//printf("%d %d\n", x, y);
 }
 
 int main(int argc, char **argv)
@@ -149,7 +162,7 @@ int main(int argc, char **argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitContextVersion(3, 2);
-	glutInitWindowSize (600, 600);
+	glutInitWindowSize (800, 800);
 	glutCreateWindow ("TSBK07 Lab 4");
 	glutDisplayFunc(display);
 	init ();
