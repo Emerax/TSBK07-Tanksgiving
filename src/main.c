@@ -78,6 +78,7 @@ TextureData ttex; // terrain
 
 // Tank shader stuff - change this to a more general "object" shader?
 GLuint tankShader;
+void drawTank(mat4);
 void tankControls(mat4*);
 
 // Tank models
@@ -89,6 +90,11 @@ float rotSpeed = 0.1f;
 float tankRot = 0;
 
 float camDistToTank = 10.0f;
+
+// Skybox stuff
+GLuint skyboxProgram;
+GLuint skyboxTexture;
+Model *skyboxModel;
 
 void init(void) {
 	// GL inits
@@ -127,6 +133,16 @@ void init(void) {
 	// TODO: Load actual tank models, not just random shapes
 	tankBase = LoadModelPlus("../assets/groundsphere.obj");
 	tankTower = LoadModelPlus("../assets/octagon.obj");
+
+	// Skybox initialization
+	skyboxProgram = loadShaders("skybox.vert", "skybox.frag");
+	glUseProgram(skyboxProgram);
+	glUniform1i(glGetUniformLocation(skyboxProgram, "texUnit"), 0);
+	glUniformMatrix4fv(glGetUniformLocation(skyboxProgram, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
+	skyboxModel = LoadModelPlus("../assets/skybox.obj");
+	
+	LoadTGATextureSimple("../assets/SkyBox512.tga", &skyboxTexture);
+	
 }
 
 void display(void) {
@@ -136,19 +152,42 @@ void display(void) {
 	mat4 total, modelView, camMatrix;
 
 	printError("pre display");
+		
+	tankControls(&camMatrix);
+
+	// Skybox display
+	glUseProgram(skyboxProgram);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, skyboxTexture); 
+
+	mat4 skyboxMat = camMatrix;
+	skyboxMat.m[3] = 0;
+	skyboxMat.m[7] = 0;
+	skyboxMat.m[11] = 0;
+
+	mat4 skyboxOffset = T(0, -2, 0);
+
+	glUniformMatrix4fv(glGetUniformLocation(skyboxProgram, "camMatrix"), 1, GL_TRUE, skyboxMat.m);
+	glUniformMatrix4fv(glGetUniformLocation(skyboxProgram, "mdlMatrix"), 1, GL_TRUE, skyboxOffset.m);
+	DrawModel(skyboxModel, skyboxProgram, "inPosition", "inNormal", "inTexCoord");
+
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 
 	glUseProgram(program);
 
 	/* NOTE: The tankControls method modifies the camMatrix, so this method should
 	   be called before uploading camMatrix to GPU */
-	tankControls(&camMatrix);
+	drawTank(camMatrix);
 	modelView = IdentityMatrix();
 	total = Mult(camMatrix, modelView);
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
 
 	glBindTexture(GL_TEXTURE_2D, tex1);		// Bind Our Texture tex1
 	DrawModel(tm, program, "inPosition", "inNormal", "inTexCoord");
-
 
 	printError("display 2");
 
@@ -179,11 +218,14 @@ void tankControls(mat4 *camMatrix) {
 		tankPos.x, tankPos.y, tankPos.z,
 		0.0, 1.0, 0.0);
 
+}
+
+void drawTank(mat4 camMatrix) {	
 	// Upload to the GPU
 	glUseProgram(tankShader);
 	mat4 tankPosMat = T(tankPos.x, tankPos.y, tankPos.z);
 	mat4 rotMat = Ry(-tankRot);
-	mat4 total = Mult(*camMatrix, Mult(tankPosMat, rotMat));
+	mat4 total = Mult(camMatrix, Mult(tankPosMat, rotMat));
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(tankBase, tankShader, "inPosition", "inNormal", "inTexCoord");
 	glUseProgram(program);
