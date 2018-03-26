@@ -183,9 +183,10 @@ void tankControls(mat4 *camMatrix) {
         // Upload to the GPU 
         glUseProgram(tankShader);
         mat4 tankPosMat = T(tankPos.x, tankPos.y, tankPos.z);
-        mat4 total = Mult(*camMatrix, tankPosMat); 
+        mat4 rotMat = Ry(-tankRot);
+        mat4 total = Mult(*camMatrix, Mult(tankPosMat, rotMat)); 
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, total.m);
-        DrawModel(tankBase, tankShader, "inPosition", "inNormal", "inTexCoord");
+        DrawModel(tankTower, tankShader, "inPosition", "inNormal", "inTexCoord");
         glUseProgram(program);
 }
 
