@@ -13,8 +13,7 @@
 
 mat4 projectionMatrix;
 
-Model* GenerateTerrain(TextureData *tex)
-{
+Model* GenerateTerrain(TextureData *tex) {
 	int vertexCount = tex->width * tex->height;
 	int triangleCount = (tex->width-1) * (tex->height-1) * 2;
 	int x, z;
@@ -28,36 +27,36 @@ Model* GenerateTerrain(TextureData *tex)
 	for (x = 0; x < tex->width; x++)
 		for (z = 0; z < tex->height; z++)
 		{
-// Vertex array. You need to scale this properly
+			// Vertex array. You need to scale this properly
 			vertexArray[(x + z * tex->width)*3 + 0] = x / 1.0;
 			vertexArray[(x + z * tex->width)*3 + 1] = tex->imageData[(x + z * tex->width) * (tex->bpp/8)] / 100.0;
 			vertexArray[(x + z * tex->width)*3 + 2] = z / 1.0;
-// Normal vectors. You need to calculate these.
+			// Normal vectors. You need to calculate these.
 			normalArray[(x + z * tex->width)*3 + 0] = 0.0;
 			normalArray[(x + z * tex->width)*3 + 1] = 1.0;
 			normalArray[(x + z * tex->width)*3 + 2] = 0.0;
-// Texture coordinates. You may want to scale them.
+			// Texture coordinates. You may want to scale them.
 			texCoordArray[(x + z * tex->width)*2 + 0] = x; // (float)x / tex->width;
 			texCoordArray[(x + z * tex->width)*2 + 1] = z; // (float)z / tex->height;
 		}
-	for (x = 0; x < tex->width-1; x++)
+		for (x = 0; x < tex->width-1; x++)
 		for (z = 0; z < tex->height-1; z++)
 		{
-		// Triangle 1
+			// Triangle 1
 			indexArray[(x + z * (tex->width-1))*6 + 0] = x + z * tex->width;
 			indexArray[(x + z * (tex->width-1))*6 + 1] = x + (z+1) * tex->width;
 			indexArray[(x + z * (tex->width-1))*6 + 2] = x+1 + z * tex->width;
-		// Triangle 2
+			// Triangle 2
 			indexArray[(x + z * (tex->width-1))*6 + 3] = x+1 + z * tex->width;
 			indexArray[(x + z * (tex->width-1))*6 + 4] = x + (z+1) * tex->width;
 			indexArray[(x + z * (tex->width-1))*6 + 5] = x+1 + (z+1) * tex->width;
 		}
 
-	// End of terrain generation
+		// End of terrain generation
 
-	// Create Model and upload to GPU:
+		// Create Model and upload to GPU:
 
-	Model* model = LoadDataToModel(
+		Model* model = LoadDataToModel(
 			vertexArray,
 			normalArray,
 			texCoordArray,
@@ -66,7 +65,7 @@ Model* GenerateTerrain(TextureData *tex)
 			vertexCount,
 			triangleCount*3);
 
-	return model;
+			return model;
 }
 
 
@@ -92,128 +91,125 @@ float tankRot = 0;
 float camDistToTank = 10.0f;
 
 void init(void) {
-    // GL inits
-    glClearColor(0.2,0.2,0.5,0);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-    printError("GL inits");
+	// GL inits
+	glClearColor(0.2,0.2,0.5,0);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	printError("GL inits");
 
-    projectionMatrix = frustum(-0.1, 0.1, -0.1, 0.1, 0.2, 50.0);
+	projectionMatrix = frustum(-0.1, 0.1, -0.1, 0.1, 0.2, 50.0);
 
 
-    // TODO: Change "terrain.frag" to a more general fragment shader that can be used by every object
-    // Remember to change the name in the loadShaders function calls
+	// TODO: Change "terrain.frag" to a more general fragment shader that can be used by every object
+	// Remember to change the name in the loadShaders function calls
 
-    // Load and compile shader
-    program = loadShaders("terrain.vert", "terrain.frag");
-    glUseProgram(program);
-    printError("init shader");
+	// Load and compile shader
+	program = loadShaders("terrain.vert", "terrain.frag");
+	glUseProgram(program);
+	printError("init shader");
 
-    glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
-    glUniform1i(glGetUniformLocation(program, "tex"), 0); // Texture unit 0
-    LoadTGATextureSimple("../assets/maskros512.tga", &tex1);
+	glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
+	glUniform1i(glGetUniformLocation(program, "tex"), 0); // Texture unit 0
+	LoadTGATextureSimple("../assets/maskros512.tga", &tex1);
 
-    // Load tank shader
-    tankShader = loadShaders("tank.vert", "terrain.frag");
-    glUseProgram(tankShader);
-    glUniformMatrix4fv(glGetUniformLocation(tankShader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
+	// Load tank shader
+	tankShader = loadShaders("tank.vert", "terrain.frag");
+	glUseProgram(tankShader);
+	glUniformMatrix4fv(glGetUniformLocation(tankShader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
 
-    // Load terrain data
+	// Load terrain data
 
-    LoadTGATextureData("../assets/big-flat-terrain.tga", &ttex);
-    tm = GenerateTerrain(&ttex);
-    printError("init terrain");
+	LoadTGATextureData("../assets/big-flat-terrain.tga", &ttex);
+	tm = GenerateTerrain(&ttex);
+	printError("init terrain");
 
-    // Load tank models
-    // TODO: Load actual tank models, not just random shapes
-    tankBase = LoadModelPlus("../assets/groundsphere.obj");
-    tankTower = LoadModelPlus("../assets/octagon.obj");
+	// Load tank models
+	// TODO: Load actual tank models, not just random shapes
+	tankBase = LoadModelPlus("../assets/groundsphere.obj");
+	tankTower = LoadModelPlus("../assets/octagon.obj");
 }
 
 void display(void) {
-    // clear the screen
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// clear the screen
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    mat4 total, modelView, camMatrix;
+	mat4 total, modelView, camMatrix;
 
-    printError("pre display");
+	printError("pre display");
 
-    glUseProgram(program);
+	glUseProgram(program);
 
-    /* NOTE: The tankControls method modifies the camMatrix, so this method should
-     be called before uploading camMatrix to GPU */
-    tankControls(&camMatrix);
-    modelView = IdentityMatrix();
-    total = Mult(camMatrix, modelView);
-    glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
+	/* NOTE: The tankControls method modifies the camMatrix, so this method should
+	   be called before uploading camMatrix to GPU */
+	tankControls(&camMatrix);
+	modelView = IdentityMatrix();
+	total = Mult(camMatrix, modelView);
+	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
 
-    glBindTexture(GL_TEXTURE_2D, tex1);		// Bind Our Texture tex1
-    DrawModel(tm, program, "inPosition", "inNormal", "inTexCoord");
+	glBindTexture(GL_TEXTURE_2D, tex1);		// Bind Our Texture tex1
+	DrawModel(tm, program, "inPosition", "inNormal", "inTexCoord");
 
 
-    printError("display 2");
+	printError("display 2");
 
-    glutSwapBuffers();
+	glutSwapBuffers();
 }
 
 // TODO: Add tank tower support - load the object, place it on top of base, rotate it freely
 void tankControls(mat4 *camMatrix) {
-    // Manage keyboard controls
-    if (glutKeyIsDown('w')) {
-        tankPos.x += moveSpeed * cos(tankRot);
-        tankPos.z += moveSpeed * sin(tankRot);
-    }
-    if (glutKeyIsDown('s')) {
-        tankPos.x -= moveSpeed * cos(tankRot);
-        tankPos.z -= moveSpeed * sin(tankRot);
-    }
-    if (glutKeyIsDown('d')) {
-        tankRot += rotSpeed;
-    }
-    if (glutKeyIsDown('a')) {
-        tankRot -= rotSpeed;
-    }
+	// Manage keyboard controls
+	if (glutKeyIsDown('w')) {
+		tankPos.x += moveSpeed * cos(tankRot);
+  	tankPos.z += moveSpeed * sin(tankRot);
+	}
+	if (glutKeyIsDown('s')) {
+		tankPos.x -= moveSpeed * cos(tankRot);
+		tankPos.z -= moveSpeed * sin(tankRot);
+	}
+	if (glutKeyIsDown('d')) {
+		tankRot += rotSpeed;
+	}
+	if (glutKeyIsDown('a')) {
+		tankRot -= rotSpeed;
+	}
 
-    vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot), tankPos.y + 4, tankPos.z - camDistToTank * sin(tankRot)};
+	vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot), tankPos.y + 4, tankPos.z - camDistToTank * sin(tankRot)};
 
-    *camMatrix = lookAt(camPos.x, camPos.y, camPos.z,
-                        tankPos.x, tankPos.y, tankPos.z,
-                        0.0, 1.0, 0.0);
+	*camMatrix = lookAt(camPos.x, camPos.y, camPos.z,
+		tankPos.x, tankPos.y, tankPos.z,
+		0.0, 1.0, 0.0);
 
-    // Upload to the GPU
-    glUseProgram(tankShader);
-    mat4 tankPosMat = T(tankPos.x, tankPos.y, tankPos.z);
-    mat4 rotMat = Ry(-tankRot);
-    mat4 total = Mult(*camMatrix, Mult(tankPosMat, rotMat));
-    glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, total.m);
-    DrawModel(tankBase, tankShader, "inPosition", "inNormal", "inTexCoord");
-    glUseProgram(program);
+	// Upload to the GPU
+	glUseProgram(tankShader);
+	mat4 tankPosMat = T(tankPos.x, tankPos.y, tankPos.z);
+	mat4 rotMat = Ry(-tankRot);
+	mat4 total = Mult(*camMatrix, Mult(tankPosMat, rotMat));
+	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, total.m);
+	DrawModel(tankBase, tankShader, "inPosition", "inNormal", "inTexCoord");
+	glUseProgram(program);
 }
 
-void timer(int i)
-{
-    glutTimerFunc(20, &timer, i);
-    glutPostRedisplay();
+void timer(int i) {
+  glutTimerFunc(20, &timer, i);
+  glutPostRedisplay();
 }
 
-void mouse(int x, int y)
-{
-    //printf("%d %d\n", x, y);
+void mouse(int x, int y) {
+  //printf("%d %d\n", x, y);
 }
 
-int main(int argc, char **argv)
-{
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
-    glutInitContextVersion(3, 2);
-    glutInitWindowSize (800, 800);
-    glutCreateWindow ("TSBK07 Lab 4");
-    glutDisplayFunc(display);
-    init ();
-    glutTimerFunc(20, &timer, 0);
+int main(int argc, char **argv) {
+  glutInit(&argc, argv);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
+  glutInitContextVersion(3, 2);
+  glutInitWindowSize (800, 800);
+  glutCreateWindow ("TSBK07 Lab 4");
+  glutDisplayFunc(display);
+  init ();
+  glutTimerFunc(20, &timer, 0);
 
-    glutPassiveMotionFunc(mouse);
+  glutPassiveMotionFunc(mouse);
 
-    glutMainLoop();
-    exit(0);
+  glutMainLoop();
+  exit(0);
 }
