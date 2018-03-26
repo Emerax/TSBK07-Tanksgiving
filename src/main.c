@@ -101,8 +101,8 @@ void init(void) {
 	projectionMatrix = frustum(-0.1, 0.1, -0.1, 0.1, 0.2, 50.0);
 
 
-  // TODO: Change "terrain.frag" to a more general fragment shader that can be used by every object
-  // Remember to change the name in the loadShaders function calls
+	// TODO: Change "terrain.frag" to a more general fragment shader that can be used by every object
+	// Remember to change the name in the loadShaders function calls
 
 	// Load and compile shader
 	program = loadShaders("terrain.vert", "terrain.frag");
@@ -113,21 +113,21 @@ void init(void) {
 	glUniform1i(glGetUniformLocation(program, "tex"), 0); // Texture unit 0
 	LoadTGATextureSimple("../assets/maskros512.tga", &tex1);
 
-  // Load tank shader
-  tankShader = loadShaders("tank.vert", "terrain.frag");
-  glUseProgram(tankShader);
+	// Load tank shader
+	tankShader = loadShaders("tank.vert", "terrain.frag");
+	glUseProgram(tankShader);
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
 
 	// Load terrain data
 
 	LoadTGATextureData("../assets/big-flat-terrain.tga", &ttex);
 	tm = GenerateTerrain(&ttex);
-  printError("init terrain");
+	printError("init terrain");
 
-  // Load tank models
-  // TODO: Load actual tank models, not just random shapes
-  tankBase = LoadModelPlus("../assets/groundsphere.obj");
-  tankTower = LoadModelPlus("../assets/octagon.obj");
+	// Load tank models
+	// TODO: Load actual tank models, not just random shapes
+	tankBase = LoadModelPlus("../assets/groundsphere.obj");
+	tankTower = LoadModelPlus("../assets/octagon.obj");
 }
 
 void display(void) {
@@ -140,9 +140,9 @@ void display(void) {
 
 	glUseProgram(program);
 
-  /* NOTE: The tankControls method modifies the camMatrix, so this method should
+	/* NOTE: The tankControls method modifies the camMatrix, so this method should
 	 be called before uploading camMatrix to GPU */
-  tankControls(&camMatrix);
+	tankControls(&camMatrix);
 	modelView = IdentityMatrix();
 	total = Mult(camMatrix, modelView);
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
@@ -158,36 +158,36 @@ void display(void) {
 
 // TODO: Add tank tower support - load the object, place it on top of base, rotate it freely
 void tankControls(mat4 *camMatrix) {
-  // Manage keyboard controls
-  if (glutKeyIsDown('w')) {
-      tankPos.x += moveSpeed * cos(tankRot);
-      tankPos.z += moveSpeed * sin(tankRot);
-  }
-  if (glutKeyIsDown('s')) {
-      tankPos.x -= moveSpeed * cos(tankRot);
-      tankPos.z -= moveSpeed * sin(tankRot);
-  }
-  if (glutKeyIsDown('d')) {
-      tankRot += rotSpeed;
-  }
-  if (glutKeyIsDown('a')) {
-      tankRot -= rotSpeed;
-  }
+	// Manage keyboard controls
+	if (glutKeyIsDown('w')) {
+			tankPos.x += moveSpeed * cos(tankRot);
+			tankPos.z += moveSpeed * sin(tankRot);
+	}
+	if (glutKeyIsDown('s')) {
+			tankPos.x -= moveSpeed * cos(tankRot);
+			tankPos.z -= moveSpeed * sin(tankRot);
+	}
+	if (glutKeyIsDown('d')) {
+			tankRot += rotSpeed;
+	}
+	if (glutKeyIsDown('a')) {
+			tankRot -= rotSpeed;
+	}
 
-  vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot), tankPos.y + 4, tankPos.z - camDistToTank * sin(tankRot)};
+	vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot), tankPos.y + 4, tankPos.z - camDistToTank * sin(tankRot)};
 
-  *camMatrix = lookAt(camPos.x, camPos.y, camPos.z,
-                      tankPos.x, tankPos.y, tankPos.z,
-                      0.0, 1.0, 0.0);
+	*camMatrix = lookAt(camPos.x, camPos.y, camPos.z,
+											tankPos.x, tankPos.y, tankPos.z,
+											0.0, 1.0, 0.0);
 
-  // Upload to the GPU
-  glUseProgram(tankShader);
-  mat4 tankPosMat = T(tankPos.x, tankPos.y, tankPos.z);
-  mat4 rotMat = Ry(-tankRot);
-  mat4 total = Mult(*camMatrix, Mult(tankPosMat, rotMat));
+	// Upload to the GPU
+	glUseProgram(tankShader);
+	mat4 tankPosMat = T(tankPos.x, tankPos.y, tankPos.z);
+	mat4 rotMat = Ry(-tankRot);
+	mat4 total = Mult(*camMatrix, Mult(tankPosMat, rotMat));
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, total.m);
-  DrawModel(tankBase, tankShader, "inPosition", "inNormal", "inTexCoord");
-  glUseProgram(program);
+	DrawModel(tankBase, tankShader, "inPosition", "inNormal", "inTexCoord");
+	glUseProgram(program);
 }
 
 void timer(int i)
