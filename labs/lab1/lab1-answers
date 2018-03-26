@@ -1,0 +1,30 @@
+lab1-answers
+
+--- 1 ---
+The origin is in the middle of the window.
+X: Right, Y: Up
+Yes, by passing it as an in parameter.
+
+--- 2 ---
+In: in-parameter, Out: out parameter, Uniform: global variable
+The vertex shader has no output
+It uploads a uniform 4D matrix with float vertices as input (ish)
+
+--- 3 ---
+50 fps
+
+--- 4 ---
+We had to pass the matrix from the vertex shader to the fragment shader.
+We use them for commnunication between vertex and fragment shader (?)
+Flat shading. Gourad shading could be used instead.
+
+--- 5 ---
+We calculated the rotation incorrectly. It looked funny without the Z-buffering.
+Rotating it? Don't know. 
+
+--- 6 ---
+The normals are needed to calculate lighting on the model.
+Changed the color to the normal vectors :D
+Yes?
+glBufferData creates and initializes a buffer object's data store
+glBindBuffer binds a buffer to an object

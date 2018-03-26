@@ -1,0 +1,31 @@
+ - 1 -
+
+ Have a separate matrix that is multiplied to every "static" matrix of each blade. 
+ ...we don't currently do this though.
+ Our solution: bladeRot = Rx(t + i * 3.1415 / 2);
+
+ It can be done by translating/rotating the blades relative to the rest of the windmill instead of using absolute values.
+
+ Read from a file instead.
+
+ - 2 - 
+
+ Keyboard controls. Movement in a circle in the XZ plane around the point (0, 10, 0).
+ You could translate and rotate the world instead of the camera. 
+
+ - 3 - 
+
+ We copied it and zeroed the 4th column (exept the 4th value :D )
+ We do not know our options really - right now we just represent them as C pointers.
+ You need to draw it first, and make sure it is always close to the camera to not make it super big. Also, disable culling and Z-buffering!
+ Don't know!
+
+ - 4 -
+ Tranform the surface position to view coordinate and subtract position of light.
+
+ You need to renormalize the interpolated vectors, such as the normal vectors.
+
+ - 5 -
+ We simply multiplied the light color with the "shade" value: res = res + shade * lightSourcesColorArr[i];
+
+ We used sin(exSurface.x). When x < 0, draw one texture, else draw the other.

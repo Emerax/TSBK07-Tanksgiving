@@ -1,0 +1,30 @@
+--- Lab 2 Answers ---
+
+ - 1 - 
+You can see differences in colors along the axes. It will always be partly blue since we passed on no color to the z value.
+
+	out_Color = vec4(texCoord, 1.0, 1.0);
+
+We multiplied the coordinate vector by sin(t), where t dependes on the time.
+
+ - 2 - 
+Vet ej? Låta CPUn pre-processa texturen?
+
+The CPU cannot pass the texture to the shaders, it needs to be loaded in the GPU
+
+ - 3 -
+Translate the model by -3 along the z axis
+
+- 4 - 
+Possibly for v = (0, 0, 0)
+
+- 5 -
+
+Fragment shader. Diffuse shading...?
+
+Position, for instance, needs the fourth dimension (in order to be able to perform translation using multiplication).
+
+- 7 -
+
+Rotating an object is done by transforming the model matrix of each given object.
+Rotating the camera is done by transforming the camera matrix, which is turn transforms each model in the scene.

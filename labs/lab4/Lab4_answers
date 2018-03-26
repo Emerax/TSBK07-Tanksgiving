@@ -1,0 +1,23 @@
+--- Lab4_answers ---
+
+ - 1 -
+ Pixels representing height. Range: 0-1 
+ 
+ 18: int triangleCount = (tex->width-1) * (tex->height-1) * 2;
+
+ - 2 -
+
+ We extended it to support free movement in the XZ plane, instead of just rotation/zoom around the Y axis. 
+
+ - 3 -
+
+ The approximation (number 2), calculating the cross product.
+
+ - 4 - 
+
+ We use the x and z position of the object to index in the vertex array. This way we find what polygon we are currently directly above. Then we calculate the plane 
+ equation of this polygon using cross product -> normal -> normal form and then use this equation to calculate the desired y value for the object.
+
+ - 5 -
+
+ We passed the position to the fragment shader and checked if y < 0.1. In that case, output blue instead of something actually useful.
