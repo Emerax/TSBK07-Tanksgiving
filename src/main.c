@@ -157,6 +157,7 @@ void display(void)
 	glutSwapBuffers();
 }
 
+// TODO: Add tank tower support - load the object, place it on top of base, rotate it freely
 void tankControls(mat4 *camMatrix) {
         // Manage keyboard controls
         if (glutKeyIsDown('w')) {
@@ -186,7 +187,7 @@ void tankControls(mat4 *camMatrix) {
         mat4 rotMat = Ry(-tankRot);
         mat4 total = Mult(*camMatrix, Mult(tankPosMat, rotMat)); 
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, total.m);
-        DrawModel(tankTower, tankShader, "inPosition", "inNormal", "inTexCoord");
+        DrawModel(tankBase, tankShader, "inPosition", "inNormal", "inTexCoord");
         glUseProgram(program);
 }
 
