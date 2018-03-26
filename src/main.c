@@ -190,26 +190,26 @@ void tankControls(mat4 *camMatrix) {
 }
 
 void timer(int i) {
-  glutTimerFunc(20, &timer, i);
-  glutPostRedisplay();
+    glutTimerFunc(20, &timer, i);
+    glutPostRedisplay();
 }
 
 void mouse(int x, int y) {
-  //printf("%d %d\n", x, y);
+    //printf("%d %d\n", x, y);
 }
 
 int main(int argc, char **argv) {
-  glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
-  glutInitContextVersion(3, 2);
-  glutInitWindowSize (800, 800);
-  glutCreateWindow ("TSBK07 Lab 4");
-  glutDisplayFunc(display);
-  init ();
-  glutTimerFunc(20, &timer, 0);
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
+    glutInitContextVersion(3, 2);
+    glutInitWindowSize (800, 800);
+    glutCreateWindow ("TSBK07 Lab 4");
+    glutDisplayFunc(display);
+    init ();
+    glutTimerFunc(20, &timer, 0);
 
-  glutPassiveMotionFunc(mouse);
+    glutPassiveMotionFunc(mouse);
 
-  glutMainLoop();
-  exit(0);
+    glutMainLoop();
+    exit(0);
 }
