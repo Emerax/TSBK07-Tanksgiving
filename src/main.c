@@ -79,10 +79,17 @@ TextureData ttex; // terrain
 
 // Tank shader stuff - change this to a more general "object" shader?
 GLuint tankShader; 
-void tankControls(mat4);
+void tankControls(mat4*);
 
 // Tank models
 Model *tankBase, *tankTower;
+
+float moveSpeed = 0.5f;
+vec3 tankPos = {1, 0, 1};
+float rotSpeed = 0.1f;
+float tankRot = 0;
+
+float camDistToTank = 10.0f;
 
 void init(void)
 {
@@ -135,13 +142,8 @@ void display(void)
 	
 	glUseProgram(program);
 
-	// Build matrix
-	
-	vec3 cam = {0, 5, 8};
-	vec3 lookAtPoint = {2, 0, 2};
-	camMatrix = lookAt(cam.x, cam.y, cam.z,
-				lookAtPoint.x, lookAtPoint.y, lookAtPoint.z,
-				0.0, 1.0, 0.0);
+        // NOTE: The tankControls method modifies the camMatrix, so this method should be called before uploading camMatrix to GPU	
+        tankControls(&camMatrix);
 	modelView = IdentityMatrix();
 	total = Mult(camMatrix, modelView);
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
@@ -149,20 +151,39 @@ void display(void)
 	glBindTexture(GL_TEXTURE_2D, tex1);		// Bind Our Texture tex1
 	DrawModel(tm, program, "inPosition", "inNormal", "inTexCoord");
 
-        tankControls(camMatrix);
 
 	printError("display 2");
 	
 	glutSwapBuffers();
 }
 
-void tankControls(mat4 camMatrix) {
+void tankControls(mat4 *camMatrix) {
         // Manage keyboard controls
+        if (glutKeyIsDown('w')) {
+            tankPos.x += moveSpeed * cos(tankRot);                
+            tankPos.z += moveSpeed * sin(tankRot);                
+        }
+        if (glutKeyIsDown('s')) {
+            tankPos.x -= moveSpeed * cos(tankRot);   
+            tankPos.z -= moveSpeed * sin(tankRot);   
+        }
+        if (glutKeyIsDown('d')) {
+            tankRot += rotSpeed;
+        }
+        if (glutKeyIsDown('a')) {
+            tankRot -= rotSpeed;
+        }
+        
+        vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot), tankPos.y + 4, tankPos.z - camDistToTank * sin(tankRot)};
+
+        *camMatrix = lookAt(camPos.x, camPos.y, camPos.z,
+                            tankPos.x, tankPos.y, tankPos.z,
+                            0.0, 1.0, 0.0);
 
         // Upload to the GPU 
         glUseProgram(tankShader);
-        mat4 tankPos = T(1.0f, 1.0f, 0);
-        mat4 total = Mult(camMatrix, tankPos); 
+        mat4 tankPosMat = T(tankPos.x, tankPos.y, tankPos.z);
+        mat4 total = Mult(*camMatrix, tankPosMat); 
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, total.m);
         DrawModel(tankBase, tankShader, "inPosition", "inNormal", "inTexCoord");
         glUseProgram(program);
