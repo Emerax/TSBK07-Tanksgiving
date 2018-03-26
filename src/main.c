@@ -77,6 +77,10 @@ GLuint program;
 GLuint tex1, tex2;
 TextureData ttex; // terrain
 
+// Tank shader stuff - change this to a more general "object" shader?
+GLuint tankShader; 
+void tankControls(mat4);
+
 // Tank models
 Model *tankBase, *tankTower;
 
@@ -90,6 +94,10 @@ void init(void)
 
 	projectionMatrix = frustum(-0.1, 0.1, -0.1, 0.1, 0.2, 50.0);
 
+
+        // TODO: Change "terrain.frag" to a more general fragment shader that can be used by every object
+        // Remember to change the name in the loadShaders function calls
+
 	// Load and compile shader
 	program = loadShaders("terrain.vert", "terrain.frag");
 	glUseProgram(program);
@@ -98,6 +106,11 @@ void init(void)
 	glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
 	glUniform1i(glGetUniformLocation(program, "tex"), 0); // Texture unit 0
 	LoadTGATextureSimple("../assets/maskros512.tga", &tex1);
+
+        // Load tank shader
+        tankShader = loadShaders("tank.vert", "terrain.frag");
+        glUseProgram(tankShader);
+	glUniformMatrix4fv(glGetUniformLocation(tankShader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
 	
 // Load terrain data
 	
@@ -106,6 +119,7 @@ void init(void)
         printError("init terrain");
 
         // Load tank models
+        // TODO: Load actual tank models, not just random shapes
         tankBase = LoadModelPlus("../assets/groundsphere.obj");
         tankTower = LoadModelPlus("../assets/octagon.obj");
 }
@@ -135,15 +149,23 @@ void display(void)
 	glBindTexture(GL_TEXTURE_2D, tex1);		// Bind Our Texture tex1
 	DrawModel(tm, program, "inPosition", "inNormal", "inTexCoord");
 
+        tankControls(camMatrix);
+
 	printError("display 2");
 	
 	glutSwapBuffers();
 }
 
-void tankControls() {
+void tankControls(mat4 camMatrix) {
         // Manage keyboard controls
 
         // Upload to the GPU 
+        glUseProgram(tankShader);
+        mat4 tankPos = T(1.0f, 1.0f, 0);
+        mat4 total = Mult(camMatrix, tankPos); 
+	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, total.m);
+        DrawModel(tankBase, tankShader, "inPosition", "inNormal", "inTexCoord");
+        glUseProgram(program);
 }
 
 void timer(int i)
