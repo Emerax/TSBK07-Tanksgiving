@@ -88,6 +88,7 @@ float moveSpeed = 0.5f;
 vec3 tankPos = {1, 0, 1};
 float rotSpeed = 0.1f;
 float tankRot = 0;
+float towerRot = 0;
 
 float camDistToTank = 10.0f;
 
@@ -204,12 +205,11 @@ void displaySkybox(mat4 camMatrix) {
 	
 }
 
-// TODO: Add tank tower support - load the object, place it on top of base, rotate it freely
 void tankControls(mat4 *camMatrix) {
 	// Manage keyboard controls
 	if (glutKeyIsDown('w')) {
 		tankPos.x += moveSpeed * cos(tankRot);
-  	tankPos.z += moveSpeed * sin(tankRot);
+		tankPos.z += moveSpeed * sin(tankRot);
 	}
 	if (glutKeyIsDown('s')) {
 		tankPos.x -= moveSpeed * cos(tankRot);
@@ -222,22 +222,41 @@ void tankControls(mat4 *camMatrix) {
 		tankRot -= rotSpeed;
 	}
 
-	vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot), tankPos.y + 4, tankPos.z - camDistToTank * sin(tankRot)};
+	vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot), 
+					tankPos.y + 4, 
+					tankPos.z - camDistToTank * sin(tankRot)};
 
 	*camMatrix = lookAt(camPos.x, camPos.y, camPos.z,
 		tankPos.x, tankPos.y, tankPos.z,
 		0.0, 1.0, 0.0);
 
+	// Rotate the tower
+	if (glutKeyIsDown('j')) {
+		towerRot += rotSpeed;
+	}
+	if (glutKeyIsDown('k')) {
+		towerRot -= rotSpeed;
+	}
+
 }
 
 void drawTank(mat4 camMatrix) {	
-	// Upload to the GPU
+	// Draw tank base
 	glUseProgram(tankShader);
 	mat4 tankPosMat = T(tankPos.x, tankPos.y, tankPos.z);
 	mat4 rotMat = Ry(-tankRot);
 	mat4 total = Mult(camMatrix, Mult(tankPosMat, rotMat));
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(tankBase, tankShader, "inPosition", "inNormal", "inTexCoord");
+
+	// Draw tank tower
+	// TODO: tankPos.y + 1 is only a placeholder, change this when a real model is used
+	mat4 towerPosMat = T(tankPos.x, tankPos.y + 1, tankPos.z);
+	mat4 towerRotMat = Ry(towerRot);
+	mat4 towerTotal = Mult(camMatrix, Mult(towerPosMat, towerRotMat));
+	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, towerTotal.m);
+	DrawModel(tankTower, tankShader, "inPosition", "inNormal", "inTexCoord");
+
 	glUseProgram(program);
 }
 
