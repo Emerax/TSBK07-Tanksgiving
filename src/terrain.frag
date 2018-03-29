@@ -10,7 +10,7 @@ out vec4 outColor;
 uniform sampler2D tex;
 
 //Hard_coded light source and color, TBD: Replace with in-variables?
-vec3 lightSource = vec3(1.0f, 0, 1.0f);
+vec3 lightSource = vec3(1.0f, -1.0f, 1.0f);
 vec3 lightColor = vec3(1.0, 1.0, 1.0);
 
 void main(void) {
@@ -22,15 +22,15 @@ void main(void) {
 	diffuse = max(0.0, diffuse); // No negative light
 
 	//Specular light component
-	vec3 r = reflect(-lightSource, normalize(normal));
-	vec3 v = normalize(surface);
+	vec3 r = normalize(reflect(-lightSource, normalize(normal)));
+	vec3 v = normalize(-surface);
 	float specular = dot(r, v);
 	if (specular > 0) {
-		specular = 1.0 * pow(specular, 	50);
+		specular = 1.0 * pow(specular, 	150);
 	}
-	specular = max(specular, 0);
+	specular = max(specular, 0.0);
 
-	float shade = 0.7 * diffuse + 0.3 * specular;
+	float shade = 0.7 * diffuse + 1 * specular;
 
 	res = shade * lightColor;
 
