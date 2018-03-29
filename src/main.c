@@ -320,7 +320,7 @@ void drawTank(mat4 camMatrix) {
 	mat4 rotMat = Ry(-tankRot);
 	mat4 total = Mult(camMatrix, Mult(tankPosMat, rotMat));
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, total.m);
-	glUniformMatrix4fv(glGetUniformLocation(tankShader, "camMatrix"), 1, GL_TRUE, camMatrix->m);
+	glUniformMatrix4fv(glGetUniformLocation(tankShader, "camMatrix"), 1, GL_TRUE, camMatrix.m);
 	DrawModel(tankBase, tankShader, "inPosition", "inNormal", "inTexCoord");
 	glUseProgram(program);
 }
