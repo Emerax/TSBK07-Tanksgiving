@@ -55,6 +55,7 @@ dkms.conf
 
 # mac stuff?
 *.swp
+*.swo
 
 # builds
 src/main
