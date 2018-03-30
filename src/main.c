@@ -13,6 +13,7 @@
 
 #include "terrain.c"
 #include "skybox.c"
+#include "shot.c"
 
 mat4 projectionMatrix;
 
@@ -38,6 +39,8 @@ float tankRot = 0;
 float towerRot = 0;
 
 float camDistToTank = 10.0f;
+
+struct Shot shot;
 
 // Skybox stuff
 GLuint skyboxProgram;
@@ -82,7 +85,9 @@ void init(void) {
 	tankTower = LoadModelPlus("../assets/octagon.obj");
 
 	skyboxProgram = initSkybox(&skyboxModel, &skyboxTexture, projectionMatrix);
-	
+	initShots(tankShader);
+	vec3 dir = {1,0,1};
+	shot = spawnShot(tankPos, dir);
 }
 
 void display(void) {
@@ -109,6 +114,8 @@ void display(void) {
 
 	glBindTexture(GL_TEXTURE_2D, tex1);		// Bind Our Texture tex1
 	DrawModel(tm, program, "inPosition", "inNormal", "inTexCoord");
+
+	int res = updateShot(&shot, camMatrix);
 
 	printError("display 2");
 
