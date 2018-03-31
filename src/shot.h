@@ -9,13 +9,13 @@
 #include "loadobj.h"
 #include "LoadTGA.h"
 
-struct Shot {
+typedef struct {
 	vec3 pos;
 	vec3 dir;
 	float distTravelled;
 	float maxDist;
-};
+} Shot;
 
 void initShots(GLuint shotProgram);
-struct Shot spawnShot(vec3 pos, vec3 dir);
-int updateShot(struct Shot *s, mat4 camMatrix);
+Shot spawnShot(vec3 pos, vec3 dir);
+int updateShot(Shot *s, mat4 camMatrix);

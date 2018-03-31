@@ -11,12 +11,12 @@ void initShots(GLuint shotProgram) {
 	program = shotProgram;
 }
 
-struct Shot spawnShot(vec3 pos, vec3 dir) {
-	struct Shot s = {pos, dir, 0, maxDist};
+Shot spawnShot(vec3 pos, vec3 dir) {
+	Shot s = {pos, dir, 0, maxDist};
 	return s;
 }
 
-int updateShot(struct Shot *s, mat4 camMatrix) {
+int updateShot(Shot *s, mat4 camMatrix) {
 	// Update position, check if reached max
 	s->pos = VectorAdd(s->pos, ScalarMult(s->dir, speed));
 	s->distTravelled += speed;

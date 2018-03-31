@@ -40,7 +40,7 @@ float towerRot = 0;
 
 float camDistToTank = 10.0f;
 
-struct Shot shot;
+Shot shot;
 
 // Skybox stuff
 GLuint skyboxProgram;
