@@ -40,8 +40,6 @@ float towerRot = 0;
 
 float camDistToTank = 10.0f;
 
-Shot shot;
-
 // Skybox stuff
 GLuint skyboxProgram;
 GLuint skyboxTexture;
@@ -86,8 +84,6 @@ void init(void) {
 
 	skyboxProgram = initSkybox(&skyboxModel, &skyboxTexture, projectionMatrix);
 	initShots(tankShader);
-	vec3 dir = {1,0,1};
-	shot = spawnShot(tankPos, dir);
 }
 
 void display(void) {
@@ -115,7 +111,7 @@ void display(void) {
 	glBindTexture(GL_TEXTURE_2D, tex1);		// Bind Our Texture tex1
 	DrawModel(tm, program, "inPosition", "inNormal", "inTexCoord");
 
-	int res = updateShot(&shot, camMatrix);
+	updateAllShots(camMatrix);
 
 	printError("display 2");
 
@@ -162,7 +158,10 @@ void tankControls(mat4 *camMatrix) {
 	if (glutKeyIsDown('k')) {
 		towerRot -= rotSpeed;
 	}
-
+	if (glutKeyIsDown(' ')) {
+		vec3 dir = {1,0,0};
+		spawnShot(tankPos, dir);
+	}
 }
 
 void drawTank(mat4 camMatrix) {	
