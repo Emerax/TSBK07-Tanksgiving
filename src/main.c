@@ -153,13 +153,13 @@ void tankControls(mat4 *camMatrix) {
 
 	// Rotate the tower
 	if (glutKeyIsDown('j')) {
-		towerRot += rotSpeed;
-	}
-	if (glutKeyIsDown('k')) {
 		towerRot -= rotSpeed;
 	}
+	if (glutKeyIsDown('k')) {
+		towerRot += rotSpeed;
+	}
 	if (glutKeyIsDown(' ')) {
-		vec3 dir = {cos(-towerRot), 0, sin(-towerRot)}; 
+		vec3 dir = {cos(towerRot), 0, sin(towerRot)}; 
 		spawnShot(tankPos, dir);
 	}
 }
@@ -177,7 +177,7 @@ void drawTank(mat4 camMatrix) {
 	// Draw tank tower
 	// TODO: tankPos.y + 1 is only a placeholder, change this when a real model is used
 	mat4 towerPosMat = T(tankPos.x, tankPos.y + 1, tankPos.z);
-	mat4 towerRotMat = Ry(towerRot);
+	mat4 towerRotMat = Ry(-towerRot);
 	mat4 towerTotal = Mult(camMatrix, Mult(towerPosMat, towerRotMat));
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, towerTotal.m);
 	DrawModel(tankTower, tankShader, "inPosition", "inNormal", "inTexCoord");
