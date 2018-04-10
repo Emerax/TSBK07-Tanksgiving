@@ -159,7 +159,7 @@ void tankControls(mat4 *camMatrix) {
 		towerRot -= rotSpeed;
 	}
 	if (glutKeyIsDown(' ')) {
-		vec3 dir = {1,0,0};
+		vec3 dir = {cos(-towerRot), 0, sin(-towerRot)}; 
 		spawnShot(tankPos, dir);
 	}
 }
