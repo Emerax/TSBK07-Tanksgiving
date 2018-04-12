@@ -11,6 +11,8 @@ float speed = 1;
 Shot** shots; 
 int shotIdx = 0;
 
+vec3 shotOffset = {0, 2, 0}; // Offset so that the shots don't appear at the player's feet
+
 void initShots(GLuint shotProgram) {
 	model = LoadModelPlus("../assets/groundsphere.obj");
 	program = shotProgram;
@@ -21,11 +23,9 @@ void initShots(GLuint shotProgram) {
 	}
 }
 
-// TODO: Fix issue where the shots that are created are not 
-// still there when updating. Probably because s falls out of scope?
 Shot* spawnShot(vec3 pos, vec3 dir) {
 	Shot* s = malloc(sizeof(Shot));
-	s->pos = pos;
+	s->pos = VectorAdd(pos, shotOffset);
 	s->dir = dir;
 	s->distTravelled = 0;
 	s->maxDist = maxDist;
@@ -56,7 +56,8 @@ int updateShot(Shot *s, mat4 camMatrix) {
 	}
 	glUseProgram(program);
 	mat4 shotPosMat = T(s->pos.x, s->pos.y, s->pos.z);
-	mat4 total = Mult(camMatrix, shotPosMat);
+	mat4 scale = S(0.2, 0.2, 0.2);
+	mat4 total = Mult(camMatrix, Mult(shotPosMat, scale));
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(model, program, "inPosition", "inNormal", "inTexCoord");	
 	
