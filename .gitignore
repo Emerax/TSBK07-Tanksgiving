@@ -1,5 +1,5 @@
 src/makefile
-
+demos/
 # Prerequisites
 *.d
 
