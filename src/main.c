@@ -37,6 +37,8 @@ vec3 tankPos = {1, 0, 1};
 float rotSpeed = 0.1f;
 float tankRot = 0;
 float towerRot = 0;
+int cooldown = 25;
+int cdCounter = 0;
 
 float camDistToTank = 10.0f;
 
@@ -159,9 +161,13 @@ void tankControls(mat4 *camMatrix) {
 		towerRot += rotSpeed;
 	}
 	if (glutKeyIsDown(' ')) {
-		vec3 dir = {cos(towerRot), 0, sin(towerRot)}; 
-		spawnShot(tankPos, dir);
+		if (cdCounter == 0) {
+			vec3 dir = {cos(towerRot), 0, sin(towerRot)}; 
+			spawnShot(tankPos, dir);
+			cdCounter = cooldown;
+		} 
 	}
+	if (cdCounter != 0) cdCounter--;
 }
 
 void drawTank(mat4 camMatrix) {	
