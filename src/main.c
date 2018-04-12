@@ -66,7 +66,7 @@ void init(void) {
 
 	glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
 	glUniform1i(glGetUniformLocation(program, "tex"), 0); // Texture unit 0
-	LoadTGATextureSimple("../assets/maskros512.tga", &tex1);
+	LoadTGATextureSimple("../assets/Snow.tga", &tex1);
 
 	// Load tank shader
 	tankShader = loadShaders("tank.vert", "terrain.frag");
@@ -86,6 +86,7 @@ void init(void) {
 
 	skyboxProgram = initSkybox(&skyboxModel, &skyboxTexture, projectionMatrix);
 	initShots(tankShader);
+
 }
 
 void display(void) {
@@ -95,7 +96,7 @@ void display(void) {
 	mat4 total, modelView, camMatrix;
 
 	printError("pre display");
-		
+
 	tankControls(&camMatrix);
 
 	displaySkybox(camMatrix, skyboxProgram, skyboxTexture, skyboxModel);
@@ -145,8 +146,8 @@ void tankControls(mat4 *camMatrix) {
 		tankPos.y -= moveSpeed;
 	}
 
-	vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot), 
-					tankPos.y + 4, 
+	vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot),
+					tankPos.y + 4,
 					tankPos.z - camDistToTank * sin(tankRot)};
 
 	*camMatrix = lookAt(camPos.x, camPos.y, camPos.z,
@@ -170,7 +171,7 @@ void tankControls(mat4 *camMatrix) {
 	if (cdCounter != 0) cdCounter--;
 }
 
-void drawTank(mat4 camMatrix) {	
+void drawTank(mat4 camMatrix) {
 	// Draw tank base
 	glUseProgram(tankShader);
 	mat4 tankPosMat = T(tankPos.x, tankPos.y, tankPos.z);
