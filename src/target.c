@@ -1,28 +1,30 @@
 #include "target.h"
 
-#define maxTargets 10
-
 Model *model;
 GLuint program;
 
-Target **targets;
 int idx = 0;
+
+Target **targets;
 
 void initTargets(GLuint targetProgram) {
 	model = LoadModelPlus("../assets/groundsphere.obj");
 	program = targetProgram; // Consider loading shaders here?
 	targets = calloc(maxTargets, sizeof(Target*));
 	int i;
-	for (i = 0; i < maxTargets; ++i) 
+	for (i = 0; i < maxTargets; ++i) {
 		targets[i] = NULL;
+	}
 }
 
 void placeTarget(vec3 pos) {
 	Target* t = malloc(sizeof(Target));
 	t->pos = pos;
 	t->idx = idx;
-	if (targets[idx] != NULL)
+	
+	if (targets[idx] != NULL) {
 		deleteTarget(targets[idx]);
+	}	
 	targets[idx] = t;
 	if (idx < maxTargets - 1) idx++;
 	else idx = 0;

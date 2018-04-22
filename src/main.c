@@ -14,6 +14,8 @@
 #include "terrain.c"
 #include "skybox.c"
 #include "shot.c"
+#include "collisions.c"
+#include "target.c"
 
 mat4 projectionMatrix;
 
@@ -86,7 +88,10 @@ void init(void) {
 
 	skyboxProgram = initSkybox(&skyboxModel, &skyboxTexture, projectionMatrix);
 	initShots(tankShader);
-
+	initTargets(tankShader);
+	// Place target
+	vec3 targetPos = {0,0,0};
+	placeTarget(targetPos);
 }
 
 void display(void) {
@@ -115,6 +120,7 @@ void display(void) {
 	DrawModel(tm, program, "inPosition", "inNormal", "inTexCoord");
 
 	updateAllShots(camMatrix);
+	displayTargets(camMatrix);
 
 	printError("display 2");
 
@@ -210,7 +216,6 @@ int main(int argc, char **argv) {
 	glutDisplayFunc(display);
 	init ();
 	glutTimerFunc(20, &timer, 0);
-
 	glutPassiveMotionFunc(mouse);
 
 	glutMainLoop();

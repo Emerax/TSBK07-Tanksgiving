@@ -1,4 +1,6 @@
 #include "shot.h"
+#include "target.h"
+#include "collisions.h"
 
 #define maxShots 100
 
@@ -7,8 +9,8 @@ GLuint program;
 
 float maxDist = 100.0f;
 float speed = 1;
+float shotScale = 0.2;
 
-Shot** shots; 
 int shotIdx = 0;
 
 vec3 shotOffset = {0, 2, 0}; // Offset so that the shots don't appear at the player's feet
@@ -40,10 +42,15 @@ Shot* spawnShot(vec3 pos, vec3 dir) {
 }
 
 void updateAllShots(mat4 camMatrix) {
-	int i;
+	int i,j;
 	for (i = 0; i < maxShots; i++) {
 		if (shots[i] != NULL)
 			updateShot(shots[i], camMatrix);
+		for (j = 0; j < maxTargets; j++) {
+			//(if (targets[j] != NULL)
+			//	collisionsTest(&shots[i]->pos, shotScale, model);
+			// TODO: Use the model of each target instead, and null check each target
+		}
 	}
 }
 
@@ -56,7 +63,7 @@ int updateShot(Shot *s, mat4 camMatrix) {
 	}
 	glUseProgram(program);
 	mat4 shotPosMat = T(s->pos.x, s->pos.y, s->pos.z);
-	mat4 scale = S(0.2, 0.2, 0.2);
+	mat4 scale = S(shotScale, shotScale, shotScale);
 	mat4 total = Mult(camMatrix, Mult(shotPosMat, scale));
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(model, program, "inPosition", "inNormal", "inTexCoord");	

@@ -8,19 +8,20 @@
 #include "VectorUtils3.h"
 #include "loadobj.h"
 #include "LoadTGA.h"
+#include "target.h"
 
-typedef struct Shot {
+typedef struct {
 	vec3 pos;
 	vec3 dir;
 	float distTravelled;
 	float maxDist;
 	int idx;
-};
+} Shot;
 
-typedef struct Shot Shot;
-// FISK
+Shot** shots; 
 
 void initShots(GLuint shotProgram);
 Shot *spawnShot(vec3 pos, vec3 dir);
+void updateAllShots(mat4 camMatrix);
 int updateShot(Shot *s, mat4 camMatrix);
 void deleteShot(Shot *s);
