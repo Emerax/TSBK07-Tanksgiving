@@ -1,3 +1,5 @@
+#ifndef SKYBOX_H
+#define SKYBOX_H
 #ifdef __APPLE__
 	#include <OpenGL/gl3.h>
 	// Linking hint for Lightweight IDE
@@ -11,3 +13,5 @@
 
 GLuint initSkybox(Model** skyboxModel, GLuint *skyboxTexture, mat4 projectionMatrix);
 void displaySkybox(mat4 camMatrix, GLuint skyboxProgram, GLuint skyboxTexture, Model *skyboxModel);
+
+#endif // SKYBOX_H

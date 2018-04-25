@@ -1,3 +1,5 @@
+#ifndef SHOT_H
+#define SHOT_H
 #ifdef __APPLE__
 	#include <OpenGL/gl3.h>
 	// Linking hint for Lightweight IDE
@@ -25,3 +27,5 @@ Shot *spawnShot(vec3 pos, vec3 dir);
 void updateAllShots(mat4 camMatrix);
 int updateShot(Shot *s, mat4 camMatrix);
 void deleteShot(Shot *s);
+
+#endif // SHOT_H
