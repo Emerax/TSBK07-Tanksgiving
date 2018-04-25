@@ -93,7 +93,7 @@ void init(void) {
 	initShots(tankShader, shots);
 	initTargets(tankShader, targets);
 	// Place target
-	vec3 targetPos = {0,0,0};
+	vec3 targetPos = {0,1,0};
 	placeTarget(targetPos);
 }
 
@@ -124,6 +124,8 @@ void display(void) {
 
 	updateAllShots(camMatrix);
 	displayTargets(camMatrix);
+
+	checkCollisions(shots, targets);
 
 	printError("display 2");
 

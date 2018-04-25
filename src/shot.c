@@ -46,7 +46,6 @@ void updateAllShots(mat4 camMatrix) {
 	for (i = 0; i < maxShots; i++) {
 		if (shots[i] != NULL)
 			updateShot(shots[i], camMatrix);
-		}
 	}
 }
 

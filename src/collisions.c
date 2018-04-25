@@ -1,4 +1,6 @@
 #include "collisions.h"
+#include "shot.h"
+#include "target.h"
 
 const GLfloat SMALL_NUMBER = -100000000;
 
@@ -22,4 +24,22 @@ bool collisionsTest(vec3 *pos, GLfloat radius, Model *target) {
 		return true;
 	}
 	return false;
+}
+
+void checkCollisions(Shot** shots, Target** targets) {
+	int i, j;
+	for (i = 0; i < maxShots; i++) {	
+		Shot* shot = shots[i];
+		if (shot != NULL) {
+			for (j = 0; j < maxTargets; j++) {
+				Target* target = targets[j];
+				if (target != NULL) {
+					// TODO: Rewrite collision test function to take a general target object, not just a model
+					if (collisionsTest(&shot->pos, shotScale, LoadModelPlus("../assets/groundsphere.obj"))) {
+						deleteShot(shot);
+					}	
+				}
+			}
+		}
+	}
 }
