@@ -22,7 +22,7 @@ typedef struct {
 
 Shot** shots; 
 
-void initShots(GLuint shotProgram);
+void initShots(GLuint shotProgram, Shot**);
 Shot *spawnShot(vec3 pos, vec3 dir);
 void updateAllShots(mat4 camMatrix);
 int updateShot(Shot *s, mat4 camMatrix);

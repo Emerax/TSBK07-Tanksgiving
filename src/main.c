@@ -49,6 +49,9 @@ GLuint skyboxProgram;
 GLuint skyboxTexture;
 Model *skyboxModel;
 
+Shot **shots;
+Target **targets;
+
 void init(void) {
 	// GL inits
 	glClearColor(0.2,0.2,0.5,0);
@@ -87,8 +90,8 @@ void init(void) {
 	tankTower = LoadModelPlus("../assets/octagon.obj");
 
 	skyboxProgram = initSkybox(&skyboxModel, &skyboxTexture, projectionMatrix);
-	initShots(tankShader);
-	initTargets(tankShader);
+	initShots(tankShader, shots);
+	initTargets(tankShader, targets);
 	// Place target
 	vec3 targetPos = {0,0,0};
 	placeTarget(targetPos);
@@ -208,6 +211,8 @@ void mouse(int x, int y) {
 }
 
 int main(int argc, char **argv) {
+	shots = calloc(maxShots, sizeof(Shot*));
+	targets = calloc(maxTargets, sizeof(Target*));
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitContextVersion(3, 2);

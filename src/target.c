@@ -7,10 +7,10 @@ int idx = 0;
 
 Target **targets;
 
-void initTargets(GLuint targetProgram) {
+void initTargets(GLuint targetProgram, Target **targetArray) {
 	model = LoadModelPlus("../assets/groundsphere.obj");
 	program = targetProgram; // Consider loading shaders here?
-	targets = calloc(maxTargets, sizeof(Target*));
+	targets = targetArray;
 	int i;
 	for (i = 0; i < maxTargets; ++i) {
 		targets[i] = NULL;
@@ -48,4 +48,8 @@ void displayTargets(mat4 camMatrix) {
 void deleteTarget(Target *t) {
 	targets[t->idx] = NULL;
 	free(t);
+}
+
+Target*** getTargets() {
+	return &targets;
 }

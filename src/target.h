@@ -21,9 +21,10 @@ typedef struct {
 
 //extern Target** targets;
 
-void initTargets(GLuint program);
+void initTargets(GLuint program, Target**);
 void placeTarget(vec3 pos);
 void displayTargets(mat4 camMatrix);
 void deleteTarget(Target*);
+Target*** getTargets();
 
 #endif // TARGET_H

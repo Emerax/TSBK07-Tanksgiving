@@ -15,10 +15,10 @@ int shotIdx = 0;
 
 vec3 shotOffset = {0, 2, 0}; // Offset so that the shots don't appear at the player's feet
 
-void initShots(GLuint shotProgram) {
+void initShots(GLuint shotProgram, Shot** shotArray) {
 	model = LoadModelPlus("../assets/groundsphere.obj");
 	program = shotProgram;
-	shots = calloc(maxShots, sizeof(Shot*));
+	shots = shotArray;
 	int i;
 	for (i = 0; i < maxShots; ++i) {
 		shots[i] = NULL;
@@ -46,10 +46,6 @@ void updateAllShots(mat4 camMatrix) {
 	for (i = 0; i < maxShots; i++) {
 		if (shots[i] != NULL)
 			updateShot(shots[i], camMatrix);
-		for (j = 0; j < maxTargets; j++) {
-			//(if (targets[j] != NULL)
-			//	collisionsTest(&shots[i]->pos, shotScale, model);
-			// TODO: Use the model of each target instead, and null check each target
 		}
 	}
 }
