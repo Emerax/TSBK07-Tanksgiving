@@ -4,6 +4,11 @@
 
 const GLfloat SMALL_NUMBER = -100000000;
 
+bool sphereCollisionTest(vec3 *pos1, GLfloat radius1, vec3 *pos2, GLfloat radius2) {
+	vec3 diff = VectorSub(*pos2, *pos1);
+	return (Norm(diff) <= radius1 + radius2);
+}
+
 bool collisionsTest(vec3 *pos, GLfloat radius, Model *target) {
 	int i; 
 	vec3 p0, p1, p2, v1, v2, n;
@@ -34,8 +39,7 @@ void checkCollisions(Shot** shots, Target** targets) {
 			for (j = 0; j < maxTargets; j++) {
 				Target* target = targets[j];
 				if (target != NULL) {
-					// TODO: Rewrite collision test function to take a general target object, not just a model
-					if (collisionsTest(&shot->pos, shotScale, LoadModelPlus("../assets/groundsphere.obj"))) {
+					if (sphereCollisionTest(&shot->pos, shotScale, &target->pos, 1)) {
 						deleteShot(shot);
 					}	
 				}

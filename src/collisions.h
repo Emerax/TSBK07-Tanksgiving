@@ -11,6 +11,9 @@
 #include "loadobj.h"
 #include "LoadTGA.h"
 
+// Extremely simple collision detection that assumes spherical objects
+bool sphereCollisionTest(vec3 *pos1, GLfloat radius1, vec3 *pos2, GLfloat radius2);
+// This function still assums that the target model in question is situated at (0,0,0)
 bool collisionsTest(vec3 *pos, GLfloat radius, Model *t);
 
 #endif // COLLISIONS_H
