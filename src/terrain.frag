@@ -3,7 +3,6 @@
 in vec2 texCoord;
 in vec3 normal;
 in vec3 surface;
-in vec3 pos;
 
 out vec4 outColor;
 
