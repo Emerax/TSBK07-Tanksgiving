@@ -56,12 +56,16 @@ int updateShot(Shot *s, mat4 camMatrix) {
 		deleteShot(s);
 		return -1;
 	}
+	GLuint prevShader;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &prevShader);
 	glUseProgram(program);
 	mat4 shotPosMat = T(s->pos.x, s->pos.y, s->pos.z);
 	mat4 scale = S(shotScale, shotScale, shotScale);
 	mat4 total = Mult(camMatrix, Mult(shotPosMat, scale));
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(model, program, "inPosition", "inNormal", "inTexCoord");	
+	
+	glUseProgram(prevShader);
 	
 	return 0;
 }

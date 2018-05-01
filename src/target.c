@@ -36,11 +36,15 @@ void displayTargets(mat4 camMatrix) {
 	for (i = 0; i < maxTargets; ++i) {
 		Target* t = targets[i];
 		if (t != NULL) {
+			GLuint prevShader;
+			glGetIntegerv(GL_CURRENT_PROGRAM, &prevShader);
 			glUseProgram(program);
 			mat4 posMat = T(t->pos.x, t->pos.y, t->pos.z);
 			mat4 total = Mult(camMatrix, posMat);
 			glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
 			DrawModel(model, program, "inPosition", "inNormal", "inTexCoord");
+
+			glUseProgram(prevShader);
 		}
 	} 
 }

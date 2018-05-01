@@ -28,7 +28,7 @@ TextureData ttex; // terrain
 
 // Tank shader stuff - change this to a more general "object" shader?
 GLuint tankShader;
-void drawTank(mat4);
+void displayTank(mat4);
 void tankControls(mat4*);
 
 // Tank models
@@ -79,7 +79,7 @@ void init(void) {
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
 
 	// Load terrain data
-
+	glUseProgram(program);
 	LoadTGATextureData("../assets/fft-terrain.tga", &ttex);
 	tm = GenerateTerrain(&ttex);
 	printError("init terrain");
@@ -109,11 +109,12 @@ void display(void) {
 
 	displaySkybox(camMatrix, skyboxProgram, skyboxTexture, skyboxModel);
 
-	glUseProgram(program);
 
 	/* NOTE: The tankControls method modifies the camMatrix, so this method should
 	   be called before uploading camMatrix to GPU */
-	drawTank(camMatrix);
+	displayTank(camMatrix);	
+
+	glUseProgram(program);
 	modelView = IdentityMatrix();
 	total = Mult(camMatrix, modelView);
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
@@ -182,7 +183,10 @@ void tankControls(mat4 *camMatrix) {
 	if (cdCounter != 0) cdCounter--;
 }
 
-void drawTank(mat4 camMatrix) {
+void displayTank(mat4 camMatrix) {
+
+	GLuint prevShader;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &prevShader);
 	// Draw tank base
 	glUseProgram(tankShader);
 	mat4 tankPosMat = T(tankPos.x, tankPos.y, tankPos.z);
@@ -200,7 +204,9 @@ void drawTank(mat4 camMatrix) {
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, towerTotal.m);
 	DrawModel(tankTower, tankShader, "inPosition", "inNormal", "inTexCoord");
 
-	glUseProgram(program);
+	// Restore the previous shader
+	glUseProgram(prevShader);
+	
 }
 
 void timer(int i) {
