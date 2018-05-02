@@ -5,7 +5,7 @@
 #define maxShots 100
 
 Model *model;
-GLuint program;
+GLuint shotShader;
 
 float maxDist = 100.0f;
 float speed = 1;
@@ -17,7 +17,7 @@ vec3 shotOffset = {0, 2, 0}; // Offset so that the shots don't appear at the pla
 
 void initShots(GLuint shotProgram, Shot** shotArray) {
 	model = LoadModelPlus("../assets/groundsphere.obj");
-	program = shotProgram;
+	shotShader = shotProgram;
 	shots = shotArray;
 	int i;
 	for (i = 0; i < maxShots; ++i) {
@@ -56,14 +56,14 @@ int updateShot(Shot *s, mat4 camMatrix) {
 		deleteShot(s);
 		return -1;
 	}
-	GLuint prevShader;
+	GLint prevShader;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &prevShader);
-	glUseProgram(program);
+	glUseProgram(shotShader);
 	mat4 shotPosMat = T(s->pos.x, s->pos.y, s->pos.z);
 	mat4 scale = S(shotScale, shotScale, shotScale);
 	mat4 total = Mult(camMatrix, Mult(shotPosMat, scale));
-	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
-	DrawModel(model, program, "inPosition", "inNormal", "inTexCoord");	
+	glUniformMatrix4fv(glGetUniformLocation(shotShader, "mdlMatrix"), 1, GL_TRUE, total.m);
+	DrawModel(model, shotShader, "inPosition", "inNormal", "inTexCoord");	
 	
 	glUseProgram(prevShader);
 	

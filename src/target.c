@@ -1,7 +1,7 @@
 #include "target.h"
 
 Model *model;
-GLuint program;
+GLuint targetShader;
 
 int idx = 0;
 
@@ -9,7 +9,7 @@ Target **targets;
 
 void initTargets(GLuint targetProgram, Target **targetArray) {
 	model = LoadModelPlus("../assets/groundsphere.obj");
-	program = targetProgram; // Consider loading shaders here?
+	targetShader = targetProgram; // Consider loading shaders here?
 	targets = targetArray;
 	int i;
 	for (i = 0; i < maxTargets; ++i) {
@@ -36,13 +36,13 @@ void displayTargets(mat4 camMatrix) {
 	for (i = 0; i < maxTargets; ++i) {
 		Target* t = targets[i];
 		if (t != NULL) {
-			GLuint prevShader;
+			GLint prevShader;
 			glGetIntegerv(GL_CURRENT_PROGRAM, &prevShader);
-			glUseProgram(program);
+			glUseProgram(targetShader);
 			mat4 posMat = T(t->pos.x, t->pos.y, t->pos.z);
 			mat4 total = Mult(camMatrix, posMat);
-			glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
-			DrawModel(model, program, "inPosition", "inNormal", "inTexCoord");
+			glUniformMatrix4fv(glGetUniformLocation(targetShader, "mdlMatrix"), 1, GL_TRUE, total.m);
+			DrawModel(model, targetShader, "inPosition", "inNormal", "inTexCoord");
 
 			glUseProgram(prevShader);
 		}

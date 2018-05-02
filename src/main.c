@@ -22,7 +22,7 @@ mat4 projectionMatrix;
 // vertex array object
 Model *m, *m2, *tm;
 // Reference to shader program
-GLuint program;
+GLuint terrainShader;
 GLuint tex1, tex2;
 TextureData ttex; // terrain
 
@@ -65,12 +65,12 @@ void init(void) {
 	// Remember to change the name in the loadShaders function calls
 
 	// Load and compile shader
-	program = loadShaders("terrain.vert", "terrain.frag");
-	glUseProgram(program);
+	terrainShader = loadShaders("terrain.vert", "terrain.frag");
+	glUseProgram(terrainShader);
 	printError("init shader");
 
-	glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
-	glUniform1i(glGetUniformLocation(program, "tex"), 0); // Texture unit 0
+	glUniformMatrix4fv(glGetUniformLocation(terrainShader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
+	glUniform1i(glGetUniformLocation(terrainShader, "tex"), 0); // Texture unit 0
 	LoadTGATextureSimple("../assets/Snow.tga", &tex1);
 
 	// Load tank shader
@@ -79,7 +79,7 @@ void init(void) {
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
 
 	// Load terrain data
-	glUseProgram(program);
+	glUseProgram(terrainShader);
 	LoadTGATextureData("../assets/fft-terrain.tga", &ttex);
 	tm = GenerateTerrain(&ttex);
 	printError("init terrain");
@@ -109,19 +109,18 @@ void display(void) {
 
 	displaySkybox(camMatrix, skyboxProgram, skyboxTexture, skyboxModel);
 
-
 	/* NOTE: The tankControls method modifies the camMatrix, so this method should
 	   be called before uploading camMatrix to GPU */
 	displayTank(camMatrix);	
 
-	glUseProgram(program);
+	glUseProgram(terrainShader);
 	modelView = IdentityMatrix();
 	total = Mult(camMatrix, modelView);
-	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
-	glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, camMatrix.m);
+	glUniformMatrix4fv(glGetUniformLocation(terrainShader, "mdlMatrix"), 1, GL_TRUE, total.m);
+	glUniformMatrix4fv(glGetUniformLocation(terrainShader, "camMatrix"), 1, GL_TRUE, camMatrix.m);
 
 	glBindTexture(GL_TEXTURE_2D, tex1);		// Bind Our Texture tex1
-	DrawModel(tm, program, "inPosition", "inNormal", "inTexCoord");
+	DrawModel(tm, terrainShader, "inPosition", "inNormal", "inTexCoord");
 
 	updateAllShots(camMatrix);
 	displayTargets(camMatrix);
@@ -185,7 +184,7 @@ void tankControls(mat4 *camMatrix) {
 
 void displayTank(mat4 camMatrix) {
 
-	GLuint prevShader;
+	GLint prevShader;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &prevShader);
 	// Draw tank base
 	glUseProgram(tankShader);
