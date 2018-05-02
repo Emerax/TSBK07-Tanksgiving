@@ -134,6 +134,10 @@ float getHeight(float x, float z, Model* terrain, TextureData* tex) {
 	int floorX = floor(x);
 	int floorZ = floor(z);
 
+	if (floorX < 0 || floorX >= tex->width || floorZ < 0 || floorZ >= tex->height) {
+		return 0;
+	}
+
 	vec3 p1, p2, p3;
 
 	// Choose which of the polygons in this square to use.
