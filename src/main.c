@@ -156,6 +156,8 @@ void tankControls(mat4 *camMatrix) {
 		tankPos.y -= moveSpeed;
 	}
 
+	tankPos.y = getHeight(tankPos.x, tankPos.z, tm, &ttex);
+
 	vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot),
 					tankPos.y + 4,
 					tankPos.z - camDistToTank * sin(tankRot)};
