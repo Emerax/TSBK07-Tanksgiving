@@ -101,7 +101,7 @@ void display(void) {
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	mat4 total, modelView, camMatrix;
+	mat4 mdlMatrix, camMatrix;
 
 	printError("pre display");
 
@@ -114,9 +114,8 @@ void display(void) {
 	displayTank(camMatrix);	
 
 	glUseProgram(terrainShader);
-	modelView = IdentityMatrix();
-	total = Mult(camMatrix, modelView);
-	glUniformMatrix4fv(glGetUniformLocation(terrainShader, "mdlMatrix"), 1, GL_TRUE, total.m);
+	mdlMatrix = IdentityMatrix();
+	glUniformMatrix4fv(glGetUniformLocation(terrainShader, "mdlMatrix"), 1, GL_TRUE, mdlMatrix.m);
 	glUniformMatrix4fv(glGetUniformLocation(terrainShader, "camMatrix"), 1, GL_TRUE, camMatrix.m);
 
 	glBindTexture(GL_TEXTURE_2D, tex1);		// Bind Our Texture tex1
@@ -190,7 +189,7 @@ void displayTank(mat4 camMatrix) {
 	glUseProgram(tankShader);
 	mat4 tankPosMat = T(tankPos.x, tankPos.y, tankPos.z);
 	mat4 rotMat = Ry(-tankRot);
-	mat4 total = Mult(camMatrix, Mult(tankPosMat, rotMat));
+	mat4 total = Mult(tankPosMat, rotMat);
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, total.m);
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "camMatrix"), 1, GL_TRUE, camMatrix.m);
 	DrawModel(tankBase, tankShader, "inPosition", "inNormal", "inTexCoord");
@@ -199,7 +198,7 @@ void displayTank(mat4 camMatrix) {
 	// TODO: tankPos.y + 1 is only a placeholder, change this when a real model is used
 	mat4 towerPosMat = T(tankPos.x, tankPos.y + 1, tankPos.z);
 	mat4 towerRotMat = Ry(-towerRot);
-	mat4 towerTotal = Mult(camMatrix, Mult(towerPosMat, towerRotMat));
+	mat4 towerTotal = Mult(towerPosMat, towerRotMat);
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, towerTotal.m);
 	DrawModel(tankTower, tankShader, "inPosition", "inNormal", "inTexCoord");
 

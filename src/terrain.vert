@@ -15,8 +15,8 @@ uniform mat4 camMatrix;
 
 void main(void) {
 	texCoord = inTexCoord;
-	gl_Position = projMatrix * mdlMatrix * vec4(inPosition, 1.0);
-	//normal = vec3(mdlMatrix * vec4(inNormal, 0.0));
+	gl_Position = projMatrix * camMatrix * mdlMatrix * vec4(inPosition, 1.0);
+	//normal = vec3(camMatrix * mdlMatrix * vec4(inNormal, 0.0));
 	normal = inNormal;
-	surface = vec3(mdlMatrix * vec4(inPosition, 1.0));
+	surface = vec3(camMatrix * mdlMatrix * vec4(inPosition, 1.0));
 }
