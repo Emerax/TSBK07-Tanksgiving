@@ -41,8 +41,8 @@ Model* GenerateTerrain(TextureData *tex)
 			// IDEA: Get 3 neighbour vertices, calculate normal using cross product of vectors between them.
 			getNeighbours(x, z, tex->width, tex->height, n);
 
-			vec3 normal = CrossProduct(VectorSub(genV(n[2], n[3], vertexArray, tex), genV(n[0], n[1], vertexArray, tex)),
-									   VectorSub(genV(n[4], n[5], vertexArray, tex), genV(n[0], n[1], vertexArray, tex)));
+			vec3 normal = CrossProduct(VectorSub(genV(n[4], n[5], vertexArray, tex), genV(n[0], n[1], vertexArray, tex)), 
+										VectorSub(genV(n[2], n[3], vertexArray, tex), genV(n[0], n[1], vertexArray, tex)));
 
 			normalArray[(x + z * tex->width)*3 + 0] = normal.x;
 			normalArray[(x + z * tex->width)*3 + 1] = normal.y;
