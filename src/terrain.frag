@@ -3,15 +3,19 @@
 in vec2 texCoord;
 in vec3 normal;
 in vec3 surface;
-in vec3 pos;
 
 out vec4 outColor;
 
 uniform sampler2D tex;
 
 //Hard_coded light source and color, TBD: Replace with in-variables?
+<<<<<<< HEAD
 vec3 lightSource = vec3(0.0f, -1.0f, 0.0f);
 vec3 lightColor = vec3(1.0, 1.0, 1.0);
+=======
+vec3 lightSource = vec3(1.0f, 1.0f, 1.0f);
+vec3 lightColor = vec3(0.7, 0.7, 0.7);
+>>>>>>> 205b86071c7b765c7afd5ffe8b511163d488cc22
 
 void main(void) {
 	vec3 res = vec3(0, 0, 0);

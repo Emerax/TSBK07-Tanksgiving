@@ -1,6 +1,6 @@
 src/makefile
-labs
-
+labs/
+demos/
 # Prerequisites
 *.d
 

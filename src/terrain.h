@@ -12,3 +12,4 @@
 vec3 genV(int x, int z, GLfloat *vertexArray, TextureData *tex);
 Model* GenerateTerrain(TextureData *tex);
 void getNeighbours(int x, int z, int width, int height, int *res);
+float getHeight(float x, float z, Model* terrain, TextureData* tex);

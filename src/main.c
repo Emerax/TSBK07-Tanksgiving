@@ -13,20 +13,26 @@
 
 #include "terrain.c"
 #include "skybox.c"
+<<<<<<< HEAD
 #include "falling_snow.c"
+=======
+#include "shot.c"
+#include "collisions.c"
+#include "target.c"
+>>>>>>> 205b86071c7b765c7afd5ffe8b511163d488cc22
 
 mat4 projectionMatrix;
 
 // vertex array object
 Model *m, *m2, *tm;
 // Reference to shader program
-GLuint program;
+GLuint terrainShader;
 GLuint tex1, tex2;
 TextureData ttex; // terrain
 
 // Tank shader stuff - change this to a more general "object" shader?
 GLuint tankShader;
-void drawTank(mat4);
+void displayTank(mat4);
 void tankControls(mat4*);
 
 // Tank models
@@ -37,6 +43,8 @@ vec3 tankPos = {1, 0, 1};
 float rotSpeed = 0.1f;
 float tankRot = 0;
 float towerRot = 0;
+int cooldown = 25;
+int cdCounter = 0;
 
 float camDistToTank = 10.0f;
 
@@ -45,9 +53,14 @@ GLuint skyboxProgram;
 GLuint skyboxTexture;
 Model *skyboxModel;
 
+<<<<<<< HEAD
 //Special snowflake variables
 GLuint snowflakeProgram;
 GLuint snowflakeTexture;
+=======
+Shot **shots;
+Target **targets;
+>>>>>>> 205b86071c7b765c7afd5ffe8b511163d488cc22
 
 void init(void) {
 	// GL inits
@@ -66,12 +79,12 @@ void init(void) {
 	// Remember to change the name in the loadShaders function calls
 
 	// Load and compile shader
-	program = loadShaders("terrain.vert", "terrain.frag");
-	glUseProgram(program);
+	terrainShader = loadShaders("terrain.vert", "terrain.frag");
+	glUseProgram(terrainShader);
 	printError("init shader");
 
-	glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
-	glUniform1i(glGetUniformLocation(program, "tex"), 0); // Texture unit 0
+	glUniformMatrix4fv(glGetUniformLocation(terrainShader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
+	glUniform1i(glGetUniformLocation(terrainShader, "tex"), 0); // Texture unit 0
 	LoadTGATextureSimple("../assets/Snow.tga", &tex1);
 
 	// Load tank shader
@@ -80,7 +93,7 @@ void init(void) {
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
 
 	// Load terrain data
-
+	glUseProgram(terrainShader);
 	LoadTGATextureData("../assets/fft-terrain.tga", &ttex);
 	tm = GenerateTerrain(&ttex);
 	printError("init terrain");
@@ -91,17 +104,25 @@ void init(void) {
 	tankTower = LoadModelPlus("../assets/octagon.obj");
 
 	skyboxProgram = initSkybox(&skyboxModel, &skyboxTexture, projectionMatrix);
+<<<<<<< HEAD
 
 	//Let it snow
 	snowflakeProgram = loadShaders("snowflake.vert", "snowflake.frag");
 	initSnowflakes(snowflakeProgram, snowflakeTexture);
+=======
+	initShots(tankShader, shots);
+	initTargets(tankShader, targets);
+	// Place target
+	vec3 targetPos = {0,1,0};
+	placeTarget(targetPos);
+>>>>>>> 205b86071c7b765c7afd5ffe8b511163d488cc22
 }
 
 void display(void) {
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	mat4 total, modelView, camMatrix;
+	mat4 mdlMatrix, camMatrix;
 
 	printError("pre display");
 
@@ -109,19 +130,28 @@ void display(void) {
 
 	displaySkybox(camMatrix, skyboxProgram, skyboxTexture, skyboxModel);
 
+<<<<<<< HEAD
 
 	glUseProgram(program);
 
+=======
+>>>>>>> 205b86071c7b765c7afd5ffe8b511163d488cc22
 	/* NOTE: The tankControls method modifies the camMatrix, so this method should
 	   be called before uploading camMatrix to GPU */
-	drawTank(camMatrix);
-	modelView = IdentityMatrix();
-	total = Mult(camMatrix, modelView);
-	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
-	glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, camMatrix.m);
+	displayTank(camMatrix);	
+
+	glUseProgram(terrainShader);
+	mdlMatrix = IdentityMatrix();
+	glUniformMatrix4fv(glGetUniformLocation(terrainShader, "mdlMatrix"), 1, GL_TRUE, mdlMatrix.m);
+	glUniformMatrix4fv(glGetUniformLocation(terrainShader, "camMatrix"), 1, GL_TRUE, camMatrix.m);
 
 	glBindTexture(GL_TEXTURE_2D, tex1);		// Bind Our Texture tex1
-	DrawModel(tm, program, "inPosition", "inNormal", "inTexCoord");
+	DrawModel(tm, terrainShader, "inPosition", "inNormal", "inTexCoord");
+
+	updateAllShots(camMatrix);
+	displayTargets(camMatrix);
+
+	checkCollisions(shots, targets);
 
 	//Snowflakes need camera position to rotate properly.
 	vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot),
@@ -159,6 +189,8 @@ void tankControls(mat4 *camMatrix) {
 		tankPos.y -= moveSpeed;
 	}
 
+	tankPos.y = getHeight(tankPos.x, tankPos.z, tm, &ttex);
+
 	vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot),
 					tankPos.y + 4,
 					tankPos.z - camDistToTank * sin(tankRot)};
@@ -169,20 +201,30 @@ void tankControls(mat4 *camMatrix) {
 
 	// Rotate the tower
 	if (glutKeyIsDown('j')) {
-		towerRot += rotSpeed;
-	}
-	if (glutKeyIsDown('k')) {
 		towerRot -= rotSpeed;
 	}
-
+	if (glutKeyIsDown('k')) {
+		towerRot += rotSpeed;
+	}
+	if (glutKeyIsDown(' ')) {
+		if (cdCounter == 0) {
+			vec3 dir = {cos(towerRot), 0, sin(towerRot)}; 
+			spawnShot(tankPos, dir);
+			cdCounter = cooldown;
+		} 
+	}
+	if (cdCounter != 0) cdCounter--;
 }
 
-void drawTank(mat4 camMatrix) {
+void displayTank(mat4 camMatrix) {
+
+	GLint prevShader;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &prevShader);
 	// Draw tank base
 	glUseProgram(tankShader);
 	mat4 tankPosMat = T(tankPos.x, tankPos.y, tankPos.z);
 	mat4 rotMat = Ry(-tankRot);
-	mat4 total = Mult(camMatrix, Mult(tankPosMat, rotMat));
+	mat4 total = Mult(tankPosMat, rotMat);
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, total.m);
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "camMatrix"), 1, GL_TRUE, camMatrix.m);
 	DrawModel(tankBase, tankShader, "inPosition", "inNormal", "inTexCoord");
@@ -190,12 +232,14 @@ void drawTank(mat4 camMatrix) {
 	// Draw tank tower
 	// TODO: tankPos.y + 1 is only a placeholder, change this when a real model is used
 	mat4 towerPosMat = T(tankPos.x, tankPos.y + 1, tankPos.z);
-	mat4 towerRotMat = Ry(towerRot);
-	mat4 towerTotal = Mult(camMatrix, Mult(towerPosMat, towerRotMat));
+	mat4 towerRotMat = Ry(-towerRot);
+	mat4 towerTotal = Mult(towerPosMat, towerRotMat);
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, towerTotal.m);
 	DrawModel(tankTower, tankShader, "inPosition", "inNormal", "inTexCoord");
 
-	glUseProgram(program);
+	// Restore the previous shader
+	glUseProgram(prevShader);
+	
 }
 
 void timer(int i) {
@@ -208,6 +252,8 @@ void mouse(int x, int y) {
 }
 
 int main(int argc, char **argv) {
+	shots = calloc(maxShots, sizeof(Shot*));
+	targets = calloc(maxTargets, sizeof(Target*));
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitContextVersion(3, 2);
@@ -216,7 +262,6 @@ int main(int argc, char **argv) {
 	glutDisplayFunc(display);
 	init ();
 	glutTimerFunc(20, &timer, 0);
-
 	glutPassiveMotionFunc(mouse);
 
 	glutMainLoop();
