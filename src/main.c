@@ -32,7 +32,7 @@ void displayTank(mat4);
 void tankControls(mat4*);
 
 // Tank models
-Model *tankBase, *tankTower;
+Model *tankBase, *tankTower, *nose;
 
 float moveSpeed = 0.5f;
 vec3 tankPos = {1, 0, 1};
@@ -87,7 +87,8 @@ void init(void) {
 	// Load tank models
 	// TODO: Load actual tank models, not just random shapes
 	tankBase = LoadModelPlus("../assets/groundsphere.obj");
-	tankTower = LoadModelPlus("../assets/octagon.obj");
+	tankTower = LoadModelPlus("../assets/groundsphere.obj");
+	nose = LoadModelPlus("../assets/nose.obj");
 
 	skyboxProgram = initSkybox(&skyboxModel, &skyboxTexture, projectionMatrix);
 	initShots(tankShader, shots);
@@ -198,11 +199,19 @@ void displayTank(mat4 camMatrix) {
 
 	// Draw tank tower
 	// TODO: tankPos.y + 1 is only a placeholder, change this when a real model is used
-	mat4 towerPosMat = T(tankPos.x, tankPos.y + 1, tankPos.z);
+	float towerScale = 0.8;
+	mat4 towerPosMat = T(tankPos.x, tankPos.y + 1.3, tankPos.z);
 	mat4 towerRotMat = Ry(-towerRot);
-	mat4 towerTotal = Mult(towerPosMat, towerRotMat);
+	mat4 towerScaleMat = S(towerScale, towerScale, towerScale);
+	mat4 towerTotal = Mult(towerPosMat, Mult(towerRotMat, towerScaleMat));
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, towerTotal.m);
 	DrawModel(tankTower, tankShader, "inPosition", "inNormal", "inTexCoord");
+
+	// Draw nose
+	mat4 nosePosMat = T(tankPos.x + 1, tankPos.y + 2.4, tankPos.z);
+	mat4 noseTotal = Mult(Ry(-towerRot), Mult(nosePosMat, Ry(1.57)));
+	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, noseTotal.m);
+	DrawModel(nose, tankShader, "inPosition", "inNormal", "inTexCoord");
 
 	// Restore the previous shader
 	glUseProgram(prevShader);
