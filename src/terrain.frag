@@ -10,7 +10,7 @@ out vec4 outColor;
 uniform sampler2D tex;
 
 //Hard_coded light source and color, TBD: Replace with in-variables?
-vec3 lightSource = vec3(1.0f, -1.0f, 1.0f);
+vec3 lightSource = vec3(0.0f, -1.0f, 0.0f);
 vec3 lightColor = vec3(1.0, 1.0, 1.0);
 
 void main(void) {

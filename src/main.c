@@ -13,6 +13,7 @@
 
 #include "terrain.c"
 #include "skybox.c"
+#include "falling_snow.c"
 
 mat4 projectionMatrix;
 
@@ -44,11 +45,19 @@ GLuint skyboxProgram;
 GLuint skyboxTexture;
 Model *skyboxModel;
 
+//Special snowflake variables
+GLuint snowflakeProgram;
+GLuint snowflakeTexture;
+
 void init(void) {
 	// GL inits
 	glClearColor(0.2,0.2,0.5,0);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
+	//Activate transparency, snowflakes need this.
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	printError("GL inits");
 
 	projectionMatrix = frustum(-0.1, 0.1, -0.1, 0.1, 0.2, 50.0);
@@ -83,6 +92,9 @@ void init(void) {
 
 	skyboxProgram = initSkybox(&skyboxModel, &skyboxTexture, projectionMatrix);
 
+	//Let it snow
+	snowflakeProgram = loadShaders("snowflake.vert", "snowflake.frag");
+	initSnowflakes(snowflakeProgram, snowflakeTexture);
 }
 
 void display(void) {
@@ -97,6 +109,7 @@ void display(void) {
 
 	displaySkybox(camMatrix, skyboxProgram, skyboxTexture, skyboxModel);
 
+
 	glUseProgram(program);
 
 	/* NOTE: The tankControls method modifies the camMatrix, so this method should
@@ -109,6 +122,12 @@ void display(void) {
 
 	glBindTexture(GL_TEXTURE_2D, tex1);		// Bind Our Texture tex1
 	DrawModel(tm, program, "inPosition", "inNormal", "inTexCoord");
+
+	//Snowflakes need camera position to rotate properly.
+	vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot),
+		tankPos.y + 4,
+		tankPos.z - camDistToTank * sin(tankRot)};
+		displaySnowflakes(camPos, projectionMatrix, camMatrix);
 
 	printError("display 2");
 
