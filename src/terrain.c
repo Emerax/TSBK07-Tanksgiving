@@ -41,7 +41,7 @@ Model* GenerateTerrain(TextureData *tex)
 			// IDEA: Get 3 neighbour vertices, calculate normal using cross product of vectors between them.
 			getNeighbours(x, z, tex->width, tex->height, n);
 
-			vec3 normal = CrossProduct(VectorSub(genV(n[4], n[5], vertexArray, tex), genV(n[0], n[1], vertexArray, tex)), 
+			vec3 normal = CrossProduct(VectorSub(genV(n[4], n[5], vertexArray, tex), genV(n[0], n[1], vertexArray, tex)),
 										VectorSub(genV(n[2], n[3], vertexArray, tex), genV(n[0], n[1], vertexArray, tex)));
 
 			normalArray[(x + z * tex->width)*3 + 0] = normal.x;
@@ -134,7 +134,7 @@ float getHeight(float x, float z, Model* terrain, TextureData* tex) {
 	int floorX = floor(x);
 	int floorZ = floor(z);
 
-	if (floorX < 0 || floorX >= tex->width || floorZ < 0 || floorZ >= tex->height) {
+	if(floorX < 0 || floorX >= tex->width || floorZ < 0 || floorZ >= tex->height){
 		return 0;
 	}
 
@@ -167,14 +167,14 @@ float getHeight(float x, float z, Model* terrain, TextureData* tex) {
 		p3.x = terrain->vertexArray[(floorX + (floorZ + 1) * tex->width) * 3 + 0];
 		p3.y = terrain->vertexArray[(floorX + (floorZ + 1) * tex->width) * 3 + 1];
 		p3.z = terrain->vertexArray[(floorX + (floorZ + 1) * tex->width) * 3 + 2];
-		
+
 	}
 
 	vec3 normal = CrossProduct(VectorSub(p2, p1), VectorSub(p3, p1));
 	if (normal.y == 0) {
 		// We don't want division by 0, return something else
 		return 0;
-	} 
+	}
 	float d = DotProduct(p1, normal);
 
 	return ((d - normal.x * x - normal.z * z) / normal.y);

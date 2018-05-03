@@ -13,13 +13,10 @@
 
 #include "terrain.c"
 #include "skybox.c"
-<<<<<<< HEAD
 #include "falling_snow.c"
-=======
 #include "shot.c"
 #include "collisions.c"
 #include "target.c"
->>>>>>> 205b86071c7b765c7afd5ffe8b511163d488cc22
 
 mat4 projectionMatrix;
 
@@ -53,23 +50,18 @@ GLuint skyboxProgram;
 GLuint skyboxTexture;
 Model *skyboxModel;
 
-<<<<<<< HEAD
 //Special snowflake variables
 GLuint snowflakeProgram;
 GLuint snowflakeTexture;
-=======
+
 Shot **shots;
 Target **targets;
->>>>>>> 205b86071c7b765c7afd5ffe8b511163d488cc22
 
 void init(void) {
 	// GL inits
 	glClearColor(0.2,0.2,0.5,0);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
-	//Activate transparency, snowflakes need this.
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	printError("GL inits");
 
@@ -104,18 +96,16 @@ void init(void) {
 	tankTower = LoadModelPlus("../assets/octagon.obj");
 
 	skyboxProgram = initSkybox(&skyboxModel, &skyboxTexture, projectionMatrix);
-<<<<<<< HEAD
 
 	//Let it snow
 	snowflakeProgram = loadShaders("snowflake.vert", "snowflake.frag");
 	initSnowflakes(snowflakeProgram, snowflakeTexture);
-=======
+
 	initShots(tankShader, shots);
 	initTargets(tankShader, targets);
 	// Place target
 	vec3 targetPos = {0,1,0};
 	placeTarget(targetPos);
->>>>>>> 205b86071c7b765c7afd5ffe8b511163d488cc22
 }
 
 void display(void) {
@@ -130,15 +120,9 @@ void display(void) {
 
 	displaySkybox(camMatrix, skyboxProgram, skyboxTexture, skyboxModel);
 
-<<<<<<< HEAD
-
-	glUseProgram(program);
-
-=======
->>>>>>> 205b86071c7b765c7afd5ffe8b511163d488cc22
 	/* NOTE: The tankControls method modifies the camMatrix, so this method should
 	   be called before uploading camMatrix to GPU */
-	displayTank(camMatrix);	
+	displayTank(camMatrix);
 
 	glUseProgram(terrainShader);
 	mdlMatrix = IdentityMatrix();
@@ -157,7 +141,7 @@ void display(void) {
 	vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot),
 		tankPos.y + 4,
 		tankPos.z - camDistToTank * sin(tankRot)};
-		displaySnowflakes(camPos, projectionMatrix, camMatrix);
+	displaySnowflakes(camPos, projectionMatrix, camMatrix);
 
 	printError("display 2");
 
@@ -208,10 +192,10 @@ void tankControls(mat4 *camMatrix) {
 	}
 	if (glutKeyIsDown(' ')) {
 		if (cdCounter == 0) {
-			vec3 dir = {cos(towerRot), 0, sin(towerRot)}; 
+			vec3 dir = {cos(towerRot), 0, sin(towerRot)};
 			spawnShot(tankPos, dir);
 			cdCounter = cooldown;
-		} 
+		}
 	}
 	if (cdCounter != 0) cdCounter--;
 }
@@ -239,7 +223,7 @@ void displayTank(mat4 camMatrix) {
 
 	// Restore the previous shader
 	glUseProgram(prevShader);
-	
+
 }
 
 void timer(int i) {
