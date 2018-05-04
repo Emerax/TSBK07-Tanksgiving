@@ -199,8 +199,8 @@ void displayTank(mat4 camMatrix) {
 
 	// Draw tank tower
 	// TODO: tankPos.y + 1 is only a placeholder, change this when a real model is used
-	float towerScale = 0.8;
-	mat4 towerPosMat = T(tankPos.x, tankPos.y + 1.3, tankPos.z);
+	float towerScale = 0.7;
+	mat4 towerPosMat = T(tankPos.x, tankPos.y + 1.5, tankPos.z);
 	mat4 towerRotMat = Ry(-towerRot);
 	mat4 towerScaleMat = S(towerScale, towerScale, towerScale);
 	mat4 towerTotal = Mult(towerPosMat, Mult(towerRotMat, towerScaleMat));
@@ -208,8 +208,8 @@ void displayTank(mat4 camMatrix) {
 	DrawModel(tankTower, tankShader, "inPosition", "inNormal", "inTexCoord");
 
 	// Draw nose
-	mat4 nosePosMat = T(tankPos.x + 1, tankPos.y + 2.4, tankPos.z);
-	mat4 noseTotal = Mult(Ry(-towerRot), Mult(nosePosMat, Ry(1.57)));
+	mat4 nosePosMat = T(0, 0.8, 0.85); // Position relative to head
+	mat4 noseTotal = Mult(towerPosMat, Mult(towerRotMat, nosePosMat));
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, noseTotal.m);
 	DrawModel(nose, tankShader, "inPosition", "inNormal", "inTexCoord");
 
