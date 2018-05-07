@@ -214,7 +214,7 @@ void tankControls(mat4 *camMatrix) {
 	}
 	if (glutKeyIsDown(' ')) {
 		if (cdCounter == 0) {
-			vec3 dir = {cos(towerRot), 0, sin(towerRot)};
+			vec3 dir = {-sin(towerRot), 0, cos(towerRot)};
 			spawnShot(tankPos, dir);
 			cdCounter = cooldown;
 		}
