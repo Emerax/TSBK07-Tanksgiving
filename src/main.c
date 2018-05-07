@@ -10,6 +10,7 @@
 #include "VectorUtils3.h"
 #include "loadobj.h"
 #include "LoadTGA.h"
+#include "simplefont.h"
 
 #include "terrain.c"
 #include "skybox.c"
@@ -17,6 +18,9 @@
 #include "shot.c"
 #include "collisions.c"
 #include "target.c"
+
+#include <stdlib.h>
+#include <stdio.h>
 
 mat4 projectionMatrix;
 
@@ -56,6 +60,10 @@ GLuint snowflakeTexture;
 
 Shot **shots;
 Target **targets;
+
+// Text display
+void displayText(int, int, char*);
+int points;
 
 void init(void) {
 	// GL inits
@@ -106,6 +114,8 @@ void init(void) {
 	// Place target
 	vec3 targetPos = {0,1,0};
 	placeTarget(targetPos);
+
+	sfMakeRasterFont();	
 }
 
 void display(void) {
@@ -135,17 +145,24 @@ void display(void) {
 	updateAllShots(camMatrix);
 	displayTargets(camMatrix);
 
-	checkCollisions(shots, targets);
+	points += checkCollisions(shots, targets);
 
 	//Snowflakes need camera position to rotate properly.
 	vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot),
 		tankPos.y + 4,
 		tankPos.z - camDistToTank * sin(tankRot)};
 	displaySnowflakes(camPos, projectionMatrix, camMatrix);
+	
+	displayText(100, 100, "<><");
 
 	printError("display 2");
 
 	glutSwapBuffers();
+}
+
+void reshape(GLsizei w, GLsizei h) {
+	glViewport(0, 0, w, h);
+	sfSetRasterSize(w, h);
 }
 
 void tankControls(mat4 *camMatrix) {
@@ -226,6 +243,16 @@ void displayTank(mat4 camMatrix) {
 
 }
 
+void displayText() {
+	char pointString[4];
+	snprintf(pointString, 4, "%d", points);
+	char text[12];
+	strcpy(text, "Points: ");
+	strcat(text, pointString);	
+
+	sfDrawString(50, 50, text);
+}
+
 void timer(int i) {
 	glutTimerFunc(20, &timer, i);
 	glutPostRedisplay();
@@ -244,6 +271,7 @@ int main(int argc, char **argv) {
 	glutInitWindowSize (800, 800);
 	glutCreateWindow ("TSBK07 Lab 4");
 	glutDisplayFunc(display);
+	glutReshapeFunc(reshape);
 	init ();
 	glutTimerFunc(20, &timer, 0);
 	glutPassiveMotionFunc(mouse);
