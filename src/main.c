@@ -33,6 +33,7 @@ void tankControls(mat4*);
 
 // Tank models
 Model *tankBase, *tankTower, *nose;
+GLuint noseTex;
 
 float moveSpeed = 0.5f;
 vec3 tankPos = {1, 0, 1};
@@ -89,6 +90,8 @@ void init(void) {
 	tankBase = LoadModelPlus("../assets/groundsphere.obj");
 	tankTower = LoadModelPlus("../assets/groundsphere.obj");
 	nose = LoadModelPlus("../assets/nose.obj");
+	glUniform1i(glGetUniformLocation(tankShader, "tex"), 0); // Texture unit 1
+	LoadTGATextureSimple("../assets/nose.tga", &noseTex);
 
 	skyboxProgram = initSkybox(&skyboxModel, &skyboxTexture, projectionMatrix);
 	initShots(tankShader, shots);
@@ -119,6 +122,7 @@ void display(void) {
 	glUniformMatrix4fv(glGetUniformLocation(terrainShader, "mdlMatrix"), 1, GL_TRUE, mdlMatrix.m);
 	glUniformMatrix4fv(glGetUniformLocation(terrainShader, "camMatrix"), 1, GL_TRUE, camMatrix.m);
 
+	glUniform1i(glGetUniformLocation(terrainShader, "tex"), 0); // Texture unit 1
 	glBindTexture(GL_TEXTURE_2D, tex1);		// Bind Our Texture tex1
 	DrawModel(tm, terrainShader, "inPosition", "inNormal", "inTexCoord");
 
@@ -189,7 +193,12 @@ void displayTank(mat4 camMatrix) {
 	GLint prevShader;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &prevShader);
 	// Draw tank base
+
 	glUseProgram(tankShader);
+	
+	// TODO: No texture is applied to snowmanbody, FIX THIS
+	glUniform1i(glGetUniformLocation(tankShader, "tex"), 0);
+	glBindTexture(GL_TEXTURE_2D, tex1);
 	mat4 tankPosMat = T(tankPos.x, tankPos.y, tankPos.z);
 	mat4 rotMat = Ry(-tankRot);
 	mat4 total = Mult(tankPosMat, rotMat);
@@ -198,7 +207,6 @@ void displayTank(mat4 camMatrix) {
 	DrawModel(tankBase, tankShader, "inPosition", "inNormal", "inTexCoord");
 
 	// Draw tank tower
-	// TODO: tankPos.y + 1 is only a placeholder, change this when a real model is used
 	float towerScale = 0.7;
 	mat4 towerPosMat = T(tankPos.x, tankPos.y + 1.5, tankPos.z);
 	mat4 towerRotMat = Ry(-towerRot);
@@ -211,6 +219,8 @@ void displayTank(mat4 camMatrix) {
 	mat4 nosePosMat = T(0, 0.8, 0.85); // Position relative to head
 	mat4 noseTotal = Mult(towerPosMat, Mult(towerRotMat, nosePosMat));
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, noseTotal.m);
+	glUniform1i(glGetUniformLocation(tankShader, "tex"), 0); // Texture unit 0 
+	glBindTexture(GL_TEXTURE_2D, noseTex);
 	DrawModel(nose, tankShader, "inPosition", "inNormal", "inTexCoord");
 
 	// Restore the previous shader
