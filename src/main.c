@@ -62,7 +62,7 @@ Shot **shots;
 Target **targets;
 
 // Text display
-void displayText(int, int, char*);
+void displayText();
 int points;
 
 void init(void) {
@@ -153,7 +153,7 @@ void display(void) {
 		tankPos.z - camDistToTank * sin(tankRot)};
 	displaySnowflakes(camPos, projectionMatrix, camMatrix);
 	
-	displayText(100, 100, "<><");
+	displayText();
 
 	printError("display 2");
 
