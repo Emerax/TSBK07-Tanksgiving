@@ -31,8 +31,9 @@ bool collisionsTest(vec3 *pos, GLfloat radius, Model *target) {
 	return false;
 }
 
-void checkCollisions(Shot** shots, Target** targets) {
+int checkCollisions(Shot** shots, Target** targets) {
 	int i, j;
+	int points = 0;
 	for (i = 0; i < maxShots; i++) {	
 		Shot* shot = shots[i];
 		if (shot != NULL) {
@@ -41,9 +42,11 @@ void checkCollisions(Shot** shots, Target** targets) {
 				if (target != NULL) {
 					if (sphereCollisionTest(&shot->pos, shotScale, &target->pos, 1)) {
 						deleteShot(shot);
+						points++;	
 					}	
 				}
 			}
 		}
 	}
+	return points;
 }

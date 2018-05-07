@@ -10,12 +10,17 @@
 #include "VectorUtils3.h"
 #include "loadobj.h"
 #include "LoadTGA.h"
+#include "simplefont.h"
 
 #include "terrain.c"
 #include "skybox.c"
+#include "falling_snow.c"
 #include "shot.c"
 #include "collisions.c"
 #include "target.c"
+
+#include <stdlib.h>
+#include <stdio.h>
 
 mat4 projectionMatrix;
 
@@ -50,14 +55,23 @@ GLuint skyboxProgram;
 GLuint skyboxTexture;
 Model *skyboxModel;
 
+//Special snowflake variables
+GLuint snowflakeProgram;
+GLuint snowflakeTexture;
+
 Shot **shots;
 Target **targets;
+
+// Text display
+void displayText();
+int points;
 
 void init(void) {
 	// GL inits
 	glClearColor(0.2,0.2,0.5,0);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
+
 	printError("GL inits");
 
 	projectionMatrix = frustum(-0.1, 0.1, -0.1, 0.1, 0.2, 50.0);
@@ -94,11 +108,18 @@ void init(void) {
 	LoadTGATextureSimple("../assets/nose.tga", &noseTex);
 
 	skyboxProgram = initSkybox(&skyboxModel, &skyboxTexture, projectionMatrix);
+
+	//Let it snow
+	snowflakeProgram = loadShaders("snowflake.vert", "snowflake.frag");
+	initSnowflakes(snowflakeProgram, snowflakeTexture);
+
 	initShots(tankShader, shots);
 	initTargets(tankShader, targets);
 	// Place target
 	vec3 targetPos = {0,1,0};
 	placeTarget(targetPos);
+
+	sfMakeRasterFont();	
 }
 
 void display(void) {
@@ -115,7 +136,7 @@ void display(void) {
 
 	/* NOTE: The tankControls method modifies the camMatrix, so this method should
 	   be called before uploading camMatrix to GPU */
-	displayTank(camMatrix);	
+	displayTank(camMatrix);
 
 	glUseProgram(terrainShader);
 	mdlMatrix = IdentityMatrix();
@@ -129,11 +150,24 @@ void display(void) {
 	updateAllShots(camMatrix);
 	displayTargets(camMatrix);
 
-	checkCollisions(shots, targets);
+	points += checkCollisions(shots, targets);
+
+	//Snowflakes need camera position to rotate properly.
+	vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot),
+		tankPos.y + 4,
+		tankPos.z - camDistToTank * sin(tankRot)};
+	displaySnowflakes(camPos, projectionMatrix, camMatrix);
+	
+	displayText();
 
 	printError("display 2");
 
 	glutSwapBuffers();
+}
+
+void reshape(GLsizei w, GLsizei h) {
+	glViewport(0, 0, w, h);
+	sfSetRasterSize(w, h);
 }
 
 void tankControls(mat4 *camMatrix) {
@@ -180,10 +214,10 @@ void tankControls(mat4 *camMatrix) {
 	}
 	if (glutKeyIsDown(' ')) {
 		if (cdCounter == 0) {
-			vec3 dir = {cos(towerRot), 0, sin(towerRot)}; 
+			vec3 dir = {cos(towerRot), 0, sin(towerRot)};
 			spawnShot(tankPos, dir);
 			cdCounter = cooldown;
-		} 
+		}
 	}
 	if (cdCounter != 0) cdCounter--;
 }
@@ -225,7 +259,17 @@ void displayTank(mat4 camMatrix) {
 
 	// Restore the previous shader
 	glUseProgram(prevShader);
-	
+
+}
+
+void displayText() {
+	char pointString[4];
+	snprintf(pointString, 4, "%d", points);
+	char text[12];
+	strcpy(text, "Points: ");
+	strcat(text, pointString);	
+
+	sfDrawString(50, 50, text);
 }
 
 void timer(int i) {
@@ -246,6 +290,7 @@ int main(int argc, char **argv) {
 	glutInitWindowSize (800, 800);
 	glutCreateWindow ("TSBK07 Lab 4");
 	glutDisplayFunc(display);
+	glutReshapeFunc(reshape);
 	init ();
 	glutTimerFunc(20, &timer, 0);
 	glutPassiveMotionFunc(mouse);
