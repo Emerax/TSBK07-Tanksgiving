@@ -1,5 +1,8 @@
 #include "target.h"
 
+#include "terrain.h"
+#include <time.h>
+
 Model *model;
 GLuint targetShader;
 
@@ -15,6 +18,7 @@ void initTargets(GLuint targetProgram, Target **targetArray) {
 	for (i = 0; i < maxTargets; ++i) {
 		targets[i] = NULL;
 	}
+	srand(time(NULL));
 }
 
 void placeTarget(vec3 pos) {
@@ -29,6 +33,25 @@ void placeTarget(vec3 pos) {
 	if (idx < maxTargets - 1) idx++;
 	else idx = 0;
 	
+}
+
+void placeRandomTarget(Model* tm, TextureData* tex) {
+	int w = tex->width;
+	int h = tex->height;
+
+	w = 10;
+	h = 10;
+
+	int x = rand() % w;
+	while (x >= w) x = rand() % w;
+	int z = rand() % h;
+	while (z >= h) z = rand() % h;
+	float y = getHeight(w, h, tm, tex);
+	
+	printf("Placed target at %d %d\n", x, z);	
+
+	vec3 pos = {x, y, z};
+	placeTarget(pos);
 }
 
 void displayTargets(mat4 camMatrix) {

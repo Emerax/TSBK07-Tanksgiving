@@ -23,6 +23,7 @@ typedef struct {
 
 void initTargets(GLuint program, Target**);
 void placeTarget(vec3 pos);
+void placeRandomTarget(Model* tm, TextureData* tex);
 void displayTargets(mat4 camMatrix);
 void deleteTarget(Target*);
 Target*** getTargets();

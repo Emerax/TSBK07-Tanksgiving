@@ -42,6 +42,7 @@ int checkCollisions(Shot** shots, Target** targets) {
 				if (target != NULL) {
 					if (sphereCollisionTest(&shot->pos, shotScale, &target->pos, 1)) {
 						deleteShot(shot);
+						deleteTarget(target);
 						points++;	
 					}	
 				}

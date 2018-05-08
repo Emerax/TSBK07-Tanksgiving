@@ -116,8 +116,7 @@ void init(void) {
 	initShots(tankShader, shots);
 	initTargets(tankShader, targets);
 	// Place target
-	vec3 targetPos = {0,1,0};
-	placeTarget(targetPos);
+	placeRandomTarget(tm, &ttex);
 
 	sfMakeRasterFont();	
 }
@@ -150,7 +149,12 @@ void display(void) {
 	updateAllShots(camMatrix);
 	displayTargets(camMatrix);
 
-	points += checkCollisions(shots, targets);
+	int pts = checkCollisions(shots, targets);
+	int p;
+	for (p = 0; p < pts; ++p) {
+		placeRandomTarget(tm, &ttex);
+	}
+	points += pts;
 
 	//Snowflakes need camera position to rotate properly.
 	vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot),
