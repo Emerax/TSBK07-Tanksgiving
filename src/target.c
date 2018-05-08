@@ -46,7 +46,7 @@ void placeRandomTarget(Model* tm, TextureData* tex) {
 	while (x >= w) x = rand() % w;
 	int z = rand() % h;
 	while (z >= h) z = rand() % h;
-	float y = getHeight(w, h, tm, tex);
+	float y = getHeight(x, z, tm, tex) + 1.5;
 	
 	printf("Placed target at %d %d\n", x, z);	
 
