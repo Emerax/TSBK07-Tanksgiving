@@ -1,6 +1,7 @@
 #include "falling_snow.h"
 #define PI 3.141592
-#define MAX_SNOWFLAKES 1000
+//One hundred thousand.
+#define MAX_SNOWFLAKES 100000
 
 static const GLfloat snowflake_vertices[] = {
 	-0.5f, -0.5f, 0.0f,
@@ -9,9 +10,12 @@ static const GLfloat snowflake_vertices[] = {
  0.5f, 0.5f, 0.0f,
 };
 
+static const vec3 UP = {0, 1, 0};
+static const vec3 RIGHT = {1, 0, 0};
+
 static const int LILL_STOFFES_CONSTANT = 4334;
 static const float SNOWFLAKE_SPAWN_HEIGHT = 100.0;
-static const float SNOWFLAKE_SPAWN_DISTANCE = 15;
+static const float SNOWFLAKE_SPAWN_DISTANCE = 50;
 static const float SNOWFLAKE_FALL_SPEED = 0.291196; //Chosen by Noora
 int i; //Loop variable
 
@@ -66,7 +70,7 @@ void displaySnowflakes(vec3 camPos, mat4 projectionMatrix, mat4 viewMatrix){
 
 	mat4 viewProjectionMatrix = Mult(projectionMatrix, viewMatrix);
 
-	//iterate over snowflakes, update positions
+	//iterate over snowflakes, update position
 	for(i = 0; i < MAX_SNOWFLAKES; i++){
 		struct snowflake s = snowflakes[i];
 		if(s.y > 0){
@@ -75,8 +79,8 @@ void displaySnowflakes(vec3 camPos, mat4 projectionMatrix, mat4 viewMatrix){
 		} else {
 		//Snowflakes below y=0 will have their xz-pos randomized and their y set to max.
 			vec2 newPos = randomUnitCircle(SNOWFLAKE_SPAWN_DISTANCE);
-			s.x = newPos.x;
-			s.z = newPos.z;
+			s.x = newPos.x + camPos.x;
+			s.z = newPos.z + camPos.z;
 			s.y = SNOWFLAKE_SPAWN_HEIGHT;
 		}
 		snowflakes[i] = s;
@@ -99,9 +103,15 @@ void displaySnowflakes(vec3 camPos, mat4 projectionMatrix, mat4 viewMatrix){
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, snowflakeTexture);
 	glUniform1i(sampler, 0);
+
 	//Upload matrices used for calculating billboard rotation
-	glUniform3f(camRight, viewMatrix.m[0], viewMatrix.m[1], viewMatrix.m[2]);
-	glUniform3f(camUp, viewMatrix.m[4], viewMatrix.m[5], viewMatrix.m[6]);
+	//viewMatrix orthogonal, traspose is inverse.
+	mat4 inverseCam = Transpose(viewMatrix);
+	//camRight and camUp given by moving (1, 0, 0) and (0, 1, 0) into worldspace
+	vec3 r = MultVec3(inverseCam, RIGHT);
+	vec3 u = MultVec3(inverseCam, UP);
+	glUniform3f(camRight, r.x, r.y, r.z);
+	glUniform3f(camUp, u.x, u.y, u.z);
 
 	glUniformMatrix4fv(billboardMatrix, 1, GL_FALSE, &viewProjectionMatrix.m[0]);
 
