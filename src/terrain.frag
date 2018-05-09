@@ -15,6 +15,9 @@ vec3 lightColor = vec3(0.7, 0.7, 0.7);
 void main(void) {
 	vec3 res = vec3(0, 0, 0);
 
+	// Ambient light component
+	float ambient = 0.5;
+
 	//Diffuse light component
 	float diffuse;
 	diffuse = dot(normalize(normal), lightSource);
@@ -29,7 +32,7 @@ void main(void) {
 	}
 	specular = max(specular, 0.0);
 
-	float shade = 0.7 * diffuse + 1 * specular;
+	float shade = 0.8 * ambient + 0.7 * diffuse + 0.7 * specular;
 
 	res = shade * lightColor;
 
