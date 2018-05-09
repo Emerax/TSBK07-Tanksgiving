@@ -62,6 +62,10 @@ GLuint snowflakeTexture;
 Shot **shots;
 Target **targets;
 
+// Ojbective arrow thingey
+Model *arrow;
+void displayArrow(mat4);
+
 // Text display
 void displayText();
 int points;
@@ -115,6 +119,9 @@ void init(void) {
 
 	initShots(tankShader, shots);
 	initTargets(tankShader, targets);
+
+	arrow = LoadModelPlus("../assets/nose.obj");
+	
 	// Place target
 	placeRandomTarget(tm, &ttex);
 
@@ -132,6 +139,7 @@ void display(void) {
 	tankControls(&camMatrix);
 
 	displaySkybox(camMatrix, skyboxProgram, skyboxTexture, skyboxModel);
+	displayArrow(camMatrix);
 
 	/* NOTE: The tankControls method modifies the camMatrix, so this method should
 	   be called before uploading camMatrix to GPU */
@@ -265,6 +273,32 @@ void displayTank(mat4 camMatrix) {
 	glUseProgram(prevShader);
 
 }
+
+void displayArrow(mat4 camMatrix) {
+	glUseProgram(tankShader);
+	glDisable(GL_CULL_FACE);
+	// Use the same method of calculating the position of the camera,
+	// but use half the distance to the player. Simple and works well!
+	vec3 arrowPos = {tankPos.x - (camDistToTank/2) * cos(tankRot),
+					tankPos.y + 4,
+					tankPos.z - (camDistToTank/2) * sin(tankRot)};
+	mat4 pos = T(arrowPos.x, arrowPos.y, arrowPos.z);
+
+	vec3 nextTargetPos = targets[nextTargetIdx]->pos;
+	vec3 dir = Normalize(VectorSub(nextTargetPos, arrowPos));
+	float rotY = acos(dir.x / (dir.x + dir.z));
+	mat4 rotYMat = Ry(rotY);
+
+	mat4 total = Mult(pos, rotYMat);
+
+	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, total.m);
+	glUniformMatrix4fv(glGetUniformLocation(tankShader, "camMatrix"), 1, GL_TRUE, camMatrix.m);
+	DrawModel(arrow, tankShader, "inPosition", "inNormal", "inTexCoord");
+
+	glEnable(GL_CULL_FACE);
+
+}
+
 
 void displayText() {
 	char pointString[4];

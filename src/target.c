@@ -9,6 +9,7 @@ GLuint targetShader;
 int idx = 0;
 
 Target **targets;
+int nextTargetIdx;
 
 void initTargets(GLuint targetProgram, Target **targetArray) {
 	model = LoadModelPlus("../assets/groundsphere.obj");
@@ -30,8 +31,10 @@ void placeTarget(vec3 pos) {
 		deleteTarget(targets[idx]);
 	}	
 	targets[idx] = t;
+	nextTargetIdx = idx;
 	if (idx < maxTargets - 1) idx++;
 	else idx = 0;
+	
 	
 }
 
