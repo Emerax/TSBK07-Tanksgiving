@@ -286,7 +286,7 @@ void displayArrow(mat4 camMatrix) {
 
 	vec3 nextTargetPos = targets[nextTargetIdx]->pos;
 	vec3 dir = Normalize(VectorSub(nextTargetPos, arrowPos));
-	float rotY = acos(dir.x / (dir.x + dir.z));
+	float rotY = atan2(dir.x, dir.z); 
 	mat4 rotYMat = Ry(rotY);
 
 	mat4 total = Mult(pos, rotYMat);

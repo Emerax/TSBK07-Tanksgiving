@@ -42,8 +42,8 @@ void placeRandomTarget(Model* tm, TextureData* tex) {
 	int w = tex->width;
 	int h = tex->height;
 
-	w = 10;
-	h = 10;
+//	w = 10;
+//	h = 10;
 
 	int x = rand() % w;
 	while (x >= w) x = rand() % w;
