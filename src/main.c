@@ -121,11 +121,11 @@ void init(void) {
 	initTargets(tankShader, targets);
 
 	arrow = LoadModelPlus("../assets/nose.obj");
-	
+
 	// Place target
 	placeRandomTarget(tm, &ttex);
 
-	sfMakeRasterFont();	
+	sfMakeRasterFont();
 }
 
 void display(void) {
@@ -136,13 +136,13 @@ void display(void) {
 
 	printError("pre display");
 
+	/* NOTE: The tankControls method modifies the camMatrix, so this method should
+	be called before uploading camMatrix to GPU */
 	tankControls(&camMatrix);
 
 	displaySkybox(camMatrix, skyboxProgram, skyboxTexture, skyboxModel);
 	displayArrow(camMatrix);
 
-	/* NOTE: The tankControls method modifies the camMatrix, so this method should
-	   be called before uploading camMatrix to GPU */
 	displayTank(camMatrix);
 
 	glUseProgram(terrainShader);
@@ -169,7 +169,7 @@ void display(void) {
 		tankPos.y + 4,
 		tankPos.z - camDistToTank * sin(tankRot)};
 	displaySnowflakes(camPos, projectionMatrix, camMatrix);
-	
+
 	displayText();
 
 	printError("display 2");
@@ -241,7 +241,7 @@ void displayTank(mat4 camMatrix) {
 	// Draw tank base
 
 	glUseProgram(tankShader);
-	
+
 	// TODO: No texture is applied to snowmanbody, FIX THIS
 	glUniform1i(glGetUniformLocation(tankShader, "tex"), 0);
 	glBindTexture(GL_TEXTURE_2D, tex1);
@@ -265,7 +265,7 @@ void displayTank(mat4 camMatrix) {
 	mat4 nosePosMat = T(0, 0.8, 0.85); // Position relative to head
 	mat4 noseTotal = Mult(towerPosMat, Mult(towerRotMat, nosePosMat));
 	glUniformMatrix4fv(glGetUniformLocation(tankShader, "mdlMatrix"), 1, GL_TRUE, noseTotal.m);
-	glUniform1i(glGetUniformLocation(tankShader, "tex"), 0); // Texture unit 0 
+	glUniform1i(glGetUniformLocation(tankShader, "tex"), 0); // Texture unit 0
 	glBindTexture(GL_TEXTURE_2D, noseTex);
 	DrawModel(nose, tankShader, "inPosition", "inNormal", "inTexCoord");
 
@@ -286,7 +286,7 @@ void displayArrow(mat4 camMatrix) {
 
 	vec3 nextTargetPos = targets[nextTargetIdx]->pos;
 	vec3 dir = Normalize(VectorSub(nextTargetPos, arrowPos));
-	float rotY = atan2(dir.x, dir.z); 
+	float rotY = atan2(dir.x, dir.z);
 	mat4 rotYMat = Ry(rotY);
 
 	mat4 total = Mult(pos, rotYMat);
@@ -305,7 +305,7 @@ void displayText() {
 	snprintf(pointString, 4, "%d", points);
 	char text[12];
 	strcpy(text, "Points: ");
-	strcat(text, pointString);	
+	strcat(text, pointString);
 
 	sfDrawString(50, 50, text);
 }

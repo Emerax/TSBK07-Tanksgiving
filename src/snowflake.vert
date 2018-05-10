@@ -14,5 +14,5 @@ void main(void){
 	texCoord.t = vertices.y+0.5;
 
 	vec3 vertexWorldPosition = worldPosition + camRight * vertices.x + camUp * vertices.y;
-	gl_Position = billboardMatrix * vec4(vertexWorldPosition, 1.0f);
+	gl_Position =  vec4(vertexWorldPosition, 1.0f) * billboardMatrix;
 }
