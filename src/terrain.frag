@@ -32,7 +32,7 @@ void main(void) {
 	}
 	specular = max(specular, 0.0);
 
-	float shade = 0.8 * ambient + 0.7 * diffuse + 0.7 * specular;
+	float shade = 1 * ambient + 0.7 * diffuse + 0.7 * specular;
 
 	res = shade * lightColor;
 
