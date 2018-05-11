@@ -10,7 +10,7 @@ bool sphereCollisionTest(vec3 *pos1, GLfloat radius1, vec3 *pos2, GLfloat radius
 }
 
 bool collisionsTest(vec3 *pos, GLfloat radius, Model *target) {
-	int i; 
+	int i;
 	vec3 p0, p1, p2, v1, v2, n;
 	GLfloat diff;
 
@@ -31,20 +31,24 @@ bool collisionsTest(vec3 *pos, GLfloat radius, Model *target) {
 	return false;
 }
 
-int checkCollisions(Shot** shots, Target** targets) {
+int checkCollisions(Shot** shots, Target** targets, vec3* collisionPos) {
 	int i, j;
 	int points = 0;
-	for (i = 0; i < maxShots; i++) {	
+	for (i = 0; i < maxShots; i++) {
 		Shot* shot = shots[i];
 		if (shot != NULL) {
 			for (j = 0; j < maxTargets; j++) {
 				Target* target = targets[j];
 				if (target != NULL) {
 					if (sphereCollisionTest(&shot->pos, shotScale, &target->pos, 1)) {
+						//Update collisionPos, this tells the particle system to spawn a snosplosion here later.
+						collisionPos->x = shot->pos.x;
+						collisionPos->y = shot->pos.y;
+						collisionPos->z = shot->pos.z;
 						deleteShot(shot);
 						deleteTarget(target);
-						points++;	
-					}	
+						points++;
+					}
 				}
 			}
 		}

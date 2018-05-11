@@ -11,6 +11,7 @@
 
 struct snowflake {
 	float x, y, z;
+	float vx, vy, vz;
 	bool active;
 };
 
@@ -22,6 +23,10 @@ typedef struct vec2 {
 void initSnowflakes(GLuint program, GLuint texture);
 
 void displaySnowflakes(vec3 camPos, mat4 projectionMatrix, mat4 viewMatrix);
+
+void spawnSnosplosion(vec3 pos, int density, float force);
+
+int nextSnowflake();
 
 struct snowflake createSnowflake(float x, float y, float z, bool active);
 

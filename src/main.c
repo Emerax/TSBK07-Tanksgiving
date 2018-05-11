@@ -62,6 +62,11 @@ GLuint snowflakeTexture;
 Shot **shots;
 Target **targets;
 
+/*Used by shots to communicate to snowflakes when to spawn snosplosions.
+	(-1, -1, -1) is always outside the map, and can therefore be used to check if
+	the vec3 has changed.*/
+vec3 snosplosionPos = {-1, -1, -1};
+
 // Ojbective arrow thingey
 Model *arrow;
 void displayArrow(mat4);
@@ -157,12 +162,21 @@ void display(void) {
 	updateAllShots(camMatrix);
 	displayTargets(camMatrix);
 
-	int pts = checkCollisions(shots, targets);
+	int pts = checkCollisions(shots, targets, &snosplosionPos);
 	int p;
 	for (p = 0; p < pts; ++p) {
 		placeRandomTarget(tm, &ttex);
 	}
 	points += pts;
+
+	if(snosplosionPos.x != -1 && snosplosionPos.y != -1 && snosplosionPos.z != -1){
+		//A collision has been reported, spawn the snosplosion!
+		spawnSnosplosion(snosplosionPos, 31095, 10);
+		//Reset values so we don't keep spawning the same snosplosion.
+		snosplosionPos.x = -1;
+		snosplosionPos.y = -1;
+		snosplosionPos.z = -1;
+	}
 
 	//Snowflakes need camera position to rotate properly.
 	vec3 camPos = {tankPos.x - camDistToTank * cos(tankRot),
