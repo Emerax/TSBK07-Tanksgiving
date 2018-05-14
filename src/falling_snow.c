@@ -18,7 +18,7 @@ static const float SNOWFLAKE_SPAWN_HEIGHT = 50.0;
 static const float SNOWFLAKE_SPAWN_DISTANCE = 30;
 static const float SNOWFLAKE_TERMINAL_V = -0.291196; //Chosen by Noora.
 static const float SNOWFLAKE_DELTA_V = 0.02; //Very gravity.
-static const float VELOCITY_MODIFIER = 0.9; //For horizontal velocity.
+static const float VELOCITY_MODIFIER = 0.99999; //For horizontal velocity.
 //Standard velocity vector causing snowflakes to fall downwards
 int i; //Loop variable
 int snowflakeCounter = 0; //Keeps track of last-activated snowflake in their list.

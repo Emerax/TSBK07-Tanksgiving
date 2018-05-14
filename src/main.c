@@ -171,7 +171,7 @@ void display(void) {
 
 	if(snosplosionPos.x != -1 && snosplosionPos.y != -1 && snosplosionPos.z != -1){
 		//A collision has been reported, spawn the snosplosion!
-		spawnSnosplosion(snosplosionPos, 31095, 10);
+		spawnSnosplosion(snosplosionPos, 8000, 5);
 		//Reset values so we don't keep spawning the same snosplosion.
 		snosplosionPos.x = -1;
 		snosplosionPos.y = -1;
