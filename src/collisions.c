@@ -40,11 +40,16 @@ int checkCollisions(Shot** shots, Target** targets, vec3* collisionPos) {
 			for (j = 0; j < maxTargets; j++) {
 				Target* target = targets[j];
 				if (target != NULL) {
-					if (sphereCollisionTest(&shot->pos, shotScale, &target->pos, 1)) {
+					// Offset positions to center of objects
+					vec3 sPos = shot->pos;
+					sPos.y += shotScale;
+					vec3 tPos = target->pos;
+					tPos.y += 1;
+					if (sphereCollisionTest(&sPos, shotScale, &tPos, 1)) {
 						//Update collisionPos, this tells the particle system to spawn a snosplosion here later.
-						collisionPos->x = shot->pos.x;
-						collisionPos->y = shot->pos.y;
-						collisionPos->z = shot->pos.z;
+						collisionPos->x = sPos.x;
+						collisionPos->y = sPos.y;
+						collisionPos->z = sPos.z;
 						deleteShot(shot);
 						deleteTarget(target);
 						points++;
